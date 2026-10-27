@@ -455,43 +455,66 @@
                             Padding="16,12"
                             Margin="0,0,0,16"
                             Visibility="{Binding HasCurrentSession, Converter={StaticResource BoolToVisConverter}}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Column="0" Text="مسح الباركود:"
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,12,0"
-                                       FontSize="13" />
+                                <TextBlock Grid.Column="0" Text="مسح الباركود:"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,12,0"
+                                           FontSize="13" />
 
-                            <TextBox Grid.Column="1"
-                                     Text="{Binding StocktakeSearch, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource StandardTextBoxStyle}"
-                                     BorderThickness="0"
-                                     FontSize="14"
-                                     VerticalContentAlignment="Center"
-                                     Margin="0,0,12,0"
-                                     Tag="امسح الباركود أو ابحث عن الصنف..." />
-
-                            <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                <TextBox Text="{Binding StocktakeCountQuantity}"
-                                         Width="80"
-                                         Height="32"
+                                <TextBox Grid.Column="1"
+                                         x:Name="StocktakeBarcodeTextBox"
+                                         Text="{Binding StocktakeSearch, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource StandardTextBoxStyle}"
+                                         BorderThickness="0"
+                                         FontSize="14"
                                          VerticalContentAlignment="Center"
-                                         TextAlignment="Center"
-                                         Margin="0,0,8,0"
-                                         FontSize="13"
-                                         Tag="الكمية" />
-                                <Button Style="{StaticResource PrimaryButtonStyle}"
-                                        Command="{Binding CountByBarcodeCommand}"
-                                        Height="32" Padding="12,0">
-                                    <TextBlock Text="تسجيل" FontWeight="Bold" FontSize="12" />
-                                </Button>
-                            </StackPanel>
-                        </Grid>
+                                         Margin="0,0,12,0"
+                                         PreviewKeyDown="StocktakeBarcodeTextBox_PreviewKeyDown"
+                                         Tag="امسح الباركود أو ابحث بالاسم / رقم الصنف ثم اضغط Enter..." />
+
+                                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                    <TextBox Text="{Binding StocktakeCountQuantityText, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="80"
+                                             Height="32"
+                                             VerticalContentAlignment="Center"
+                                             TextAlignment="Center"
+                                             Margin="0,0,8,0"
+                                             FontSize="13"
+                                             Tag="الكمية" />
+                                    <Button Style="{StaticResource PrimaryButtonStyle}"
+                                            Command="{Binding CountByBarcodeCommand}"
+                                            Height="32" Padding="12,0"
+                                            Margin="0,0,8,0">
+                                        <TextBlock Text="تسجيل" FontWeight="Bold" FontSize="12" />
+                                    </Button>
+                                    <Button Style="{StaticResource OutlineButtonStyle}"
+                                            Command="{Binding CountProductCommand}"
+                                            Height="32" Padding="12,0">
+                                        <TextBlock Text="تسجيل الصنف المحدد" FontSize="12" />
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+
+                            <TextBlock Text="اكتب الكمية المعدودة (تقبل الأرقام العربية) ثم: امسح الباركود أو اكتب الاسم/رقم الصنف واضغط Enter، أو اختر الصنف من الجدول واضغط «تسجيل الصنف المحدد»."
+                                       FontSize="11"
+                                       Margin="0,10,0,0"
+                                       TextWrapping="Wrap"
+                                       Foreground="{StaticResource TextSecondaryBrush}" />
+
+                            <TextBlock Text="{Binding StatusMessage}"
+                                       FontSize="12"
+                                       Margin="0,6,0,0"
+                                       TextWrapping="Wrap"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource TextPrimaryBrush}" />
+                        </StackPanel>
                     </Border>
 
                     <!-- Stocktake Lines Grid -->

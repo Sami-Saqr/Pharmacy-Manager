@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Windows;
 using CarPartManager.Models;
 using CarPartManager.MVVM;
@@ -435,6 +436,9 @@ namespace CarPartManager.ViewModels
         public ObservableCollection<StocktakeLineModel> StocktakeLines { get; } = new();
         public ObservableCollection<StocktakeSessionModel> StocktakeHistory { get; } = new();
 
+        /// <summary>كل بنود الجلسة المحمّلة، ويُعرض منها في الجدول ما يطابق نص البحث فقط.</summary>
+        private readonly List<StocktakeLineModel> _allStocktakeLines = new();
+
         private StocktakeLineModel? _selectedStocktakeLine;
         public StocktakeLineModel? SelectedStocktakeLine
         {
@@ -446,14 +450,21 @@ namespace CarPartManager.ViewModels
         public string StocktakeSearch
         {
             get => _stocktakeSearch;
-            set => SetProperty(ref _stocktakeSearch, value);
+            set
+            {
+                if (SetProperty(ref _stocktakeSearch, value))
+                {
+                    ApplyStocktakeFilter();
+                }
+            }
         }
 
-        private int _stocktakeCountQuantity;
-        public int StocktakeCountQuantity
+        /// <summary>الكمية المعدودة كما كتبها المستخدم (نص لدعم الأرقام العربية).</summary>
+        private string _stocktakeCountQuantityText = string.Empty;
+        public string StocktakeCountQuantityText
         {
-            get => _stocktakeCountQuantity;
-            set => SetProperty(ref _stocktakeCountQuantity, value);
+            get => _stocktakeCountQuantityText;
+            set => SetProperty(ref _stocktakeCountQuantityText, value);
         }
 
         private string _stocktakeCountNotes = string.Empty;
@@ -523,16 +534,113 @@ namespace CarPartManager.ViewModels
             try
             {
                 var lines = await _stocktakeService.GetLinesAsync(CurrentSession.Id);
-                StocktakeLines.Clear();
-                foreach (var l in lines)
-                {
-                    StocktakeLines.Add(l);
-                }
+                _allStocktakeLines.Clear();
+                _allStocktakeLines.AddRange(lines);
+                ApplyStocktakeFilter();
             }
             catch (Exception ex)
             {
                 StatusMessage = $"خطأ في تحميل بنود الجرد: {ex.Message}";
+                MessageBox.Show($"تعذر تحميل بنود الجرد:\n{ex.Message}", "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        /// <summary>يعرض في الجدول البنود المطابقة لنص البحث (الاسم / رقم الصنف / الباركود) مع توحيد الأرقام العربية.</summary>
+        private void ApplyStocktakeFilter()
+        {
+            var term = Normalize(StocktakeSearch);
+
+            StocktakeLines.Clear();
+            foreach (var line in _allStocktakeLines)
+            {
+                if (term.Length == 0 || MatchesTerm(line, term))
+                {
+                    StocktakeLines.Add(line);
+                }
+            }
+        }
+
+        /// <summary>توحيد نص الإدخال: تحويل الأرقام العربية إلى لاتينية وحذف الفراغات الطرفية.</summary>
+        private static string Normalize(string? value) => PhoneHelper.NormalizeDigits(value)?.Trim() ?? string.Empty;
+
+        private static bool MatchesTerm(StocktakeLineModel line, string term) =>
+            ContainsIgnoreCase(line.ProductName, term)
+            || ContainsIgnoreCase(line.PartNumber, term)
+            || ContainsIgnoreCase(line.Barcode, term);
+
+        private static bool ContainsIgnoreCase(string? source, string term) =>
+            !string.IsNullOrEmpty(source) && source.Contains(term, StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// يبحث عن بند العد المطابق: مطابقة تامة بالباركود (قارئ الباركود)، ثم رقم الصنف، ثم الاسم.
+        /// عند تطابق الاسم مع أكثر من بند يُعاد null مع تعيين ambiguous = true لعدم تسجيل عدّ خاطئ.
+        /// </summary>
+        private StocktakeLineModel? FindStocktakeLine(string term, out bool ambiguous)
+        {
+            ambiguous = false;
+
+            var exact = _allStocktakeLines.FirstOrDefault(l => string.Equals(l.Barcode?.Trim(), term, StringComparison.OrdinalIgnoreCase))
+                ?? _allStocktakeLines.FirstOrDefault(l => string.Equals(l.PartNumber?.Trim(), term, StringComparison.OrdinalIgnoreCase));
+            if (exact != null) return exact;
+
+            var byName = _allStocktakeLines.Where(l => ContainsIgnoreCase(l.ProductName, term)).ToList();
+            if (byName.Count == 1) return byName[0];
+
+            ambiguous = byName.Count > 1;
+            return null;
+        }
+
+        /// <summary>رسالة عربية توضّح إن كان الصنف غير موجود أصلاً أم أنه موجود لكنه خارج نطاق جلسة الجرد.</summary>
+        private async Task<string> BuildStocktakeNotFoundMessageAsync(string term)
+        {
+            try
+            {
+                var byBarcode = await _productService.GetByBarcodeAsync(term);
+                if (byBarcode != null)
+                {
+                    return $"الصنف «{byBarcode.Name}» موجود في الأصناف لكنه غير مشمول في نطاق جلسة الجرد الحالية.";
+                }
+
+                var searchResult = await _productService.SearchProductsAsync(term);
+                if (searchResult != null && searchResult.Any())
+                {
+                    return $"الصنف «{term}» موجود في الأصناف لكنه غير مشمول في نطاق جلسة الجرد الحالية.";
+                }
+
+                return $"لا يوجد صنف مطابق لـ «{term}» في هذه الجلسة ولا في قائمة الأصناف.";
+            }
+            catch (Exception ex)
+            {
+                return $"لا يوجد صنف مطابق لـ «{term}» في هذه الجلسة، وتعذر التحقق من قائمة الأصناف: {ex.Message}";
+            }
+        }
+
+        /// <summary>قراءة الكمية المعدودة من الحقل النصي مع دعم الأرقام العربية، وإرجاع رسالة عربية واضحة عند الفشل.</summary>
+        private bool TryReadCountedQuantity(out int quantity, out string error)
+        {
+            quantity = 0;
+            error = string.Empty;
+
+            var text = Normalize(StocktakeCountQuantityText).Replace(" ", string.Empty);
+            if (text.Length == 0)
+            {
+                error = "أدخل الكمية المعدودة (عدد صحيح 0 أو أكثر) ثم أعد المحاولة.";
+                return false;
+            }
+
+            if (!int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out quantity))
+            {
+                error = "الكمية المعدودة غير صحيحة. أدخل عدداً صحيحاً (0 أو أكثر).";
+                return false;
+            }
+
+            if (quantity < 0)
+            {
+                error = "الكمية المعدودة لا يمكن أن تكون سالبة.";
+                return false;
+            }
+
+            return true;
         }
 
         private async Task ExecuteStartCountingAsync()
@@ -607,6 +715,7 @@ namespace CarPartManager.ViewModels
             {
                 await _stocktakeService.CancelSessionAsync(CurrentSession.Id, "إلغاء من قبل المستخدم");
                 CurrentSession = null;
+                _allStocktakeLines.Clear();
                 StocktakeLines.Clear();
                 StatusMessage = "تم إلغاء جلسة الجرد";
             }
@@ -618,21 +727,36 @@ namespace CarPartManager.ViewModels
 
         private async Task ExecuteCountProductAsync()
         {
-            if (CurrentSession == null || SelectedStocktakeLine == null) return;
-
-            if (StocktakeCountQuantity < 0)
+            if (CurrentSession == null)
             {
-                MessageBox.Show("الكمية لا يمكن أن تكون سالبة.", "خطأ", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("لا توجد جلسة جرد نشطة. أنشئ جلسة جديدة أولاً.", "تنبيه", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (SelectedStocktakeLine == null)
+            {
+                MessageBox.Show("حدد صنفاً من جدول البنود أولاً، ثم اضغط «تسجيل الصنف المحدد».", "تنبيه", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (!TryReadCountedQuantity(out var quantity, out var error))
+            {
+                MessageBox.Show(error, "تنبيه", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             try
             {
-                await _stocktakeService.CountProductAsync(CurrentSession.Id, SelectedStocktakeLine.ProductId, StocktakeCountQuantity, StocktakeCountNotes);
+                await _stocktakeService.CountProductAsync(CurrentSession.Id, SelectedStocktakeLine.ProductId, quantity, StocktakeCountNotes);
                 await LoadStocktakeLinesAsync();
-                StocktakeCountQuantity = 0;
+                StocktakeCountQuantityText = string.Empty;
                 StocktakeCountNotes = string.Empty;
-                StatusMessage = "تم تسجيل العد";
+                SelectedStocktakeLine = null;
+                StatusMessage = $"تم تسجيل العد (المعدود: {quantity})";
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "تعذر تسجيل العد", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             catch (Exception ex)
             {
@@ -642,28 +766,50 @@ namespace CarPartManager.ViewModels
 
         private async Task ExecuteCountByBarcodeAsync()
         {
-            if (CurrentSession == null || string.IsNullOrWhiteSpace(StocktakeSearch)) return;
-
-            if (StocktakeCountQuantity < 0)
+            if (CurrentSession == null)
             {
-                MessageBox.Show("الكمية لا يمكن أن تكون سالبة.", "خطأ", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("لا توجد جلسة جرد نشطة. أنشئ جلسة جديدة أولاً.", "تنبيه", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var term = Normalize(StocktakeSearch);
+            if (term.Length == 0)
+            {
+                MessageBox.Show("امسح الباركود أو اكتب اسم الصنف / رقم الصنف ثم اضغط Enter.", "تنبيه", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (!TryReadCountedQuantity(out var quantity, out var error))
+            {
+                MessageBox.Show(error, "تنبيه", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var target = FindStocktakeLine(term, out var ambiguous);
+            if (target == null)
+            {
+                var message = ambiguous
+                    ? $"يوجد أكثر من صنف مطابق لـ «{term}». حدد الصنف من الجدول ثم اضغط «تسجيل الصنف المحدد»."
+                    : await BuildStocktakeNotFoundMessageAsync(term);
+                MessageBox.Show(message, "تنبيه", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             try
             {
-                var success = await _stocktakeService.CountByBarcodeAsync(CurrentSession.Id, StocktakeSearch, StocktakeCountQuantity, StocktakeCountNotes);
-                if (!success)
-                {
-                    MessageBox.Show("الباركود غير موجود في هذه الجلسة.", "خطأ", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
+                await _stocktakeService.CountProductAsync(CurrentSession.Id, target.ProductId, quantity, StocktakeCountNotes);
 
-                await LoadStocktakeLinesAsync();
-                StocktakeCountQuantity = 0;
-                StocktakeCountNotes = string.Empty;
+                // إفراغ البحث قبل إعادة التحميل ليعود الجدول لعرض كل البنود بما فيها السطر المسجَّل
                 StocktakeSearch = string.Empty;
-                StatusMessage = "تم تسجيل العد بالباركود";
+                await LoadStocktakeLinesAsync();
+
+                StocktakeCountQuantityText = string.Empty;
+                StocktakeCountNotes = string.Empty;
+                StatusMessage = $"تم تسجيل العد: {target.ProductName} — المعدود: {quantity}";
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "تعذر تسجيل العد", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             catch (Exception ex)
             {
