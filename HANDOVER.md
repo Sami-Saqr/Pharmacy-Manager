@@ -1,5 +1,31 @@
 ﻿# CarPartManager - Handover Document
 
+## Latest: Stocktake tab did nothing after creating a session — FIXED (branch `fix-stocktake`)
+**Date:** 2026-10-27
+**Symptom:** "الجرد" tab: a session could be created and opened, but counting/adding a product did nothing — no row appeared and no message was shown. Reproduced on a fresh database.
+
+**Root causes (confirmed, code-only — no `.db` touched):**
+1. `Views/InventoryView.xaml` (~L498 and L527): the count-lines `DataGrid` (`Grid.Row="2"`) and the sessions-history card were **both in `Grid.Row="2"`**. The history card is declared last and uses `ContentPanelCardStyle` (opaque `CardBackgroundBrush` + shadow), so it painted **on top of** every count row. The lines existed (snapshot generated correctly by `SqliteStocktakeService.CreateSessionAsync`) and any recorded count was persisted — it was simply invisible.
+2. `ViewModels/InventoryViewModel.cs:221` — `CountProductCommand` was created but **bound nowhere in XAML**, and `ExecuteCountProductAsync` started with a silent `if (SelectedStocktakeLine == null) return;`, so the click/selection path produced no row and no message.
+3. `Views/InventoryView.xaml` (~L470) — the barcode box had **no Enter handling**, so a USB scanner's Enter was a no-op; and `ExecuteCountByBarcodeAsync` returned **silently** when the search text was empty.
+4. `Services/SqliteStocktakeService.GetLineByBarcodeAsync` (L297–303) matched the barcode **exactly** only — no name / part-number lookup, no Arabic-digit normalisation.
+
+Ruled out: `DbInitializer.EnsureStocktakeTablesCreatedAsync` DDL matches the EF model (`StocktakeSessions` / `StocktakeLines`, `SessionId NOT NULL`, FK cascade); `CreateSessionAsync` does generate one line per product; the count-time `BookQuantity` refresh (`CountProductAsync`) has no fresh-DB issue.
+
+**Changes (2 commits):**
+1. `cecf9de` — `Views/InventoryView.xaml`: history card moved to `Grid.Row="4"`, so the count grid is visible again.
+2. `069e4fd` — counting actually works:
+   - `Views/InventoryView.xaml` + `InventoryView.xaml.cs`: the barcode box got `x:Name="StocktakeBarcodeTextBox"` and a `PreviewKeyDown` handler that commits the binding (`UpdateSource())`), executes `CountByBarcodeCommand` and keeps focus (and select-all) in the field — same scanner pattern as POS (`SalesInvoicesView`).
+   - `ViewModels/InventoryViewModel.cs`: the counted quantity is now a **text** input (`StocktakeCountQuantityText`, `PhoneHelper.NormalizeDigits`, integer ≥ 0) so Arabic-Indic digits are accepted; a per-keystroke filter over the loaded lines (name / part number / barcode) drives the grid; `FindStocktakeLine` resolves barcode → part number → unique name (ambiguous name match is refused instead of counting the wrong product); every silent `return` was replaced by an explicit Arabic `MessageBox` (no active session, empty term, empty/invalid quantity, "not found" vs "outside the session scope", ambiguous match, status guard `لا يمكن العد في جلسة معتمدة أو ملغاة.`); added a visible hint + `StatusMessage` line in the counting card.
+   - `Views/InventoryView.xaml`: new "تسجيل الصنف المحدد" button bound to the previously-unbound `CountProductCommand` (click path: select a row → enter quantity → click).
+**Unchanged:** approval rules (review-only, once, `StockMovements` in one transaction, stock untouched before approval), the DDL, and the service/interface.
+
+**Build/Test:** `dotnet build CarPartManager.csproj` → **Build succeeded, 0 Error(s)** (8 pre-existing `CS8602` warnings in `InventoryViewModel.cs` 218–221); `dotnet test CarPartManager.Tests\CarPartManager.Tests.csproj` → **Passed! Failed: 0, Passed: 15**, EXIT=0. App not run, no `.db` touched, no new packages.
+
+**Manual test steps (not runtime-tested here):** fresh DB → "المخزون والجرد" → "الجرد" → "جلسة جديدة" → the lines grid must list the products. Type a quantity (Arabic digits accepted) → scan a barcode and press Enter (or type a name / part number and press Enter): the row must refresh immediately with الرصيد وقت العد / المعدود / الفرق / الحالة and the focus must stay in the field. Or select a row in the grid and press "تسجيل الصنف المحدد". An unknown code, a code outside the session scope, an ambiguous name, an empty/invalid quantity and counting on an approved/cancelled session must each show a clear Arabic message.
+
+**Risks:** low. The fix is XAML/VM only. Known design choice: the counted quantity is edited in the counting card's quantity box (then Enter / "تسجيل الصنف المحدد"), not inline in the grid cell. `IStocktakeService.CountByBarcodeAsync` is left in place but no longer called by the VM (resolution now happens in memory against the loaded session lines).
+
 ## Latest: Unit cost at sale stored on sales lines — reports no longer drift (branch `feature-cost-at-sale`)
 **Date:** 2026-10-24
 **Problem:** sales invoice lines did not store the unit cost at sale time, so COGS in the accounting reports was computed from `Products.PurchasePrice` (the **latest** purchase price — updated by purchase approval at `SqlitePurchaseInvoiceService.cs:292`). Historical profit therefore changed whenever a product's cost changed.
