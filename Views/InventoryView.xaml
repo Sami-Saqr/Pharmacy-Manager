@@ -523,7 +523,8 @@
                     </Border>
 
                     <!-- Stocktake History -->
-                    <Border Grid.Row="2" Style="{StaticResource ContentPanelCardStyle}" Padding="0" Margin="0,16,0,0">
+                    <!-- الصف 4 وليس 2: كان السجل في نفس صف جدول البنود فيغطيه ويُخفي كل العدّ المسجَّل -->
+                    <Border Grid.Row="4" Style="{StaticResource ContentPanelCardStyle}" Padding="0" Margin="0,16,0,0">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
