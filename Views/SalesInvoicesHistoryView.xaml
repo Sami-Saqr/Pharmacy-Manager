@@ -154,10 +154,12 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border Background="#EFF6FF" CornerRadius="4" Padding="8,3"
-                                            HorizontalAlignment="Left" VerticalAlignment="Center">
+                                            HorizontalAlignment="Stretch" VerticalAlignment="Center">
                                         <TextBlock Text="{Binding InvoiceNumber}"
                                                    FontFamily="Consolas" FontSize="12" FontWeight="Bold"
-                                                   Foreground="{StaticResource PrimaryBlueBrush}" />
+                                                   Foreground="{StaticResource PrimaryBlueBrush}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   ToolTip="{Binding InvoiceNumber}" />
                                     </Border>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -175,7 +177,7 @@
                         </DataGridTemplateColumn>
 
                         <!-- اسم العميل -->
-                        <DataGridTemplateColumn Header="العميل / الورشة" Width="1.6*" MinWidth="140">
+                        <DataGridTemplateColumn Header="العميل / الورشة" Width="*" MinWidth="140">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding CustomerName}"
@@ -195,28 +197,32 @@
                                     <TextBlock Text="{Binding CustomerPhone}"
                                                FontSize="12" FontFamily="Consolas"
                                                Foreground="{StaticResource TextSecondaryBrush}"
-                                               VerticalAlignment="Center" />
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis"
+                                               ToolTip="{Binding CustomerPhone}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
                         <!-- طريقة الدفع -->
-                        <DataGridTemplateColumn Header="الدفع" Width="75" MinWidth="65">
+                        <DataGridTemplateColumn Header="الدفع" Width="90" MinWidth="80">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border Background="#F1F5F9" CornerRadius="4" Padding="6,2"
-                                            HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding PaymentMethod}" FontSize="10" Foreground="#475569" />
+                                            HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding PaymentMethod}" FontSize="10" Foreground="#475569"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   ToolTip="{Binding PaymentMethod}" />
                                     </Border>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
                         <!-- الحالة -->
-                        <DataGridTemplateColumn Header="الحالة" Width="80" MinWidth="70">
+                        <DataGridTemplateColumn Header="الحالة" Width="90" MinWidth="80">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border CornerRadius="4" Padding="6,3" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Border CornerRadius="4" Padding="6,3" HorizontalAlignment="Stretch" VerticalAlignment="Center">
                                         <Border.Style>
                                             <Style TargetType="Border">
                                                 <Style.Triggers>
@@ -233,7 +239,9 @@
                                             </Style>
                                         </Border.Style>
                                         <TextBlock Text="{Binding Status}" FontSize="11" FontWeight="Bold"
-                                                   Foreground="{Binding StatusColor}" />
+                                                   Foreground="{Binding StatusColor}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   ToolTip="{Binding Status}" />
                                     </Border>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -265,7 +273,7 @@
                         </DataGridTemplateColumn>
 
                         <!-- ملاحظات -->
-                        <DataGridTemplateColumn Header="ملاحظات" Width="1.2*" MinWidth="100">
+                        <DataGridTemplateColumn Header="ملاحظات" Width="*" MinWidth="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Notes}"
