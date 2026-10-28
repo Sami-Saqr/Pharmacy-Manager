@@ -8,7 +8,7 @@ using CarPartManager.Views;
 namespace CarPartManager.ViewModels
 {
     /// <summary>
-    /// الـ ViewModel الرئيسي للتطبيق. يتحكم في شريط التنقل الجانبي والتبديل بين الصفحات (Views)
+    /// نموذج العرض الرئيسي للتطبيق وتوجيه التنقل بين الشاشات
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
@@ -16,7 +16,22 @@ namespace CarPartManager.ViewModels
         public ViewModelBase CurrentViewModel
         {
             get => _currentViewModel;
-            set => SetProperty(ref _currentViewModel, value);
+            set
+            {
+                if (SetProperty(ref _currentViewModel, value))
+                {
+                    OnPropertyChanged(nameof(IsHome));
+                }
+            }
+        }
+
+        public bool IsHome => CurrentViewModel is HomeViewModel;
+
+        private string _currentScreenTitle = "الرئيسية";
+        public string CurrentScreenTitle
+        {
+            get => _currentScreenTitle;
+            private set => SetProperty(ref _currentScreenTitle, value);
         }
 
         private string _storeName = "مركز الصقر لقطع غيار السيارات";
@@ -50,6 +65,7 @@ namespace CarPartManager.ViewModels
         public ObservableCollection<NavItem> NavigationItems { get; }
 
         public RelayCommand NavigateCommand { get; }
+        public RelayCommand GoHomeCommand { get; }
 
         // التخزين المؤقت للـ ViewModels لتجنب إعادة بنائها
         private readonly DashboardViewModel _dashboardViewModel;
@@ -64,6 +80,7 @@ namespace CarPartManager.ViewModels
         private readonly CustomersViewModel _customersViewModel;
         private readonly ExpensesViewModel _expensesViewModel;
         private readonly ReportsViewModel _reportsViewModel;
+        private readonly HomeViewModel _homeViewModel;
         private readonly HashSet<ViewModelBase> _loadedViewModels = new();
         private readonly HashSet<ViewModelBase> _loadingViewModels = new();
         private readonly HashSet<ViewModelBase> _pendingRefreshes = new();
@@ -95,7 +112,7 @@ namespace CarPartManager.ViewModels
 
             NavigationItems = new ObservableCollection<NavItem>
             {
-                new NavItem("Dashboard", "الرئيسية", "M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z", true),
+                new NavItem("Dashboard", "نظرة عامة على المتجر", "M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"),
                 new NavItem("Products", "الأصناف وقطع الغيار", "M20 7l-8-4-8 4 8 4 8-4zm-8 6l-8-4v8l8 4 8-4v-8l-8 4z"),
                 new NavItem("Inventory", "المخزون والجرد", "M4 6h16v2H4V6zm2 4h12v2H6v-2zm-2 4h16v2H4v-2zm2 4h12v2H6v-2z"),
                 new NavItem("POS", "نقطة البيع (الكاشير)", "M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"),
@@ -108,6 +125,9 @@ namespace CarPartManager.ViewModels
                 new NavItem("Expenses", "المصروفات", "M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"),
                 new NavItem("Reports", "التقارير المحاسبية", "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z")
             };
+
+            _homeViewModel = new HomeViewModel(NavigationItems);
+            CurrentViewModel = _homeViewModel;
 
             NavigateCommand = new RelayCommand(param =>
             {
@@ -126,11 +146,12 @@ namespace CarPartManager.ViewModels
                 }
             });
 
-            NavigateTo(NavigationItems[0]);
+            GoHomeCommand = new RelayCommand(GoHome);
         }
 
         private void NavigateTo(NavItem selectedItem)
         {
+            CurrentScreenTitle = selectedItem.Title;
             var previousViewModel = CurrentViewModel;
 
             // تحديث حالة الاختيار لجميع العناصر
@@ -250,6 +271,19 @@ namespace CarPartManager.ViewModels
             }
 
             CurrentViewModel = placeholder;
+            IsNavigationLoading = false;
+        }
+
+        private void GoHome()
+        {
+            foreach (var item in NavigationItems)
+            {
+                item.IsSelected = false;
+            }
+
+            CurrentScreenTitle = "الرئيسية";
+            CurrentViewModel = _homeViewModel;
+            _navigationRequest++;
             IsNavigationLoading = false;
         }
 

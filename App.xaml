@@ -20,6 +20,10 @@
                 <views:DashboardView />
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type viewmodels:HomeViewModel}">
+                <views:HomeView />
+            </DataTemplate>
+
             <DataTemplate DataType="{x:Type viewmodels:ProductsViewModel}">
                 <views:ProductsView />
             </DataTemplate>
