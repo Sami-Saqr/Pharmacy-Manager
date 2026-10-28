@@ -203,45 +203,52 @@
                           ItemsSource="{Binding FilteredProducts}"
                           SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
                           RowHeight="48" 
-                          SelectionMode="Single">
+                          SelectionMode="Single"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
                         <!-- كود القطعة OEM -->
-                        <DataGridTemplateColumn Header="كود OEM" Width="120">
+                        <DataGridTemplateColumn Header="كود OEM" Width="120" MinWidth="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border Background="#F1F5F9" CornerRadius="4" Padding="6,3" HorizontalAlignment="Left">
-                                        <TextBlock Text="{Binding PartNumber}" FontFamily="Consolas, Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#1E293B" />
+                                    <Border Background="#F1F5F9" CornerRadius="4" Padding="6,3" HorizontalAlignment="Stretch">
+                                        <TextBlock Text="{Binding PartNumber}" FontFamily="Consolas, Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#1E293B"
+                                                   TextTrimming="CharacterEllipsis" ToolTip="{Binding PartNumber}" />
                                     </Border>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
                         <!-- الباركود -->
-                        <DataGridTemplateColumn Header="الباركود" Width="110">
+                        <DataGridTemplateColumn Header="الباركود" Width="110" MinWidth="90">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Barcode}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
+                                    <TextBlock Text="{Binding Barcode}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"
+                                               TextTrimming="CharacterEllipsis" ToolTip="{Binding Barcode}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
                         <!-- اسم الصنف / القطعة -->
-                        <DataGridTemplateColumn Header="اسم الصنف / القطعة" Width="1.8*">
+                        <DataGridTemplateColumn Header="اسم الصنف / القطعة" Width="*" MinWidth="180">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}" />
-                                        <TextBlock Text="{Binding Category}" FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="0,2,0,0" />
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}"
+                                                   TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" />
+                                        <TextBlock Text="{Binding Category}" FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="0,2,0,0"
+                                                   TextTrimming="CharacterEllipsis" ToolTip="{Binding Category}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
                         <!-- السيارات المتوافقة -->
-                        <DataGridTextColumn Header="السيارات المتوافقة" Binding="{Binding CompatibleVehicles}" Width="1.5*" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <DataGridTextColumn Header="السيارات المتوافقة" Binding="{Binding CompatibleVehicles}" Width="*" MinWidth="120"
+                                            ElementStyle="{StaticResource DataGridTextCellStyle}" Foreground="{StaticResource TextSecondaryBrush}" />
 
                         <!-- سعر الشراء / التكلفة -->
-                        <DataGridTemplateColumn Header="سعر الشراء" Width="95">
+                        <DataGridTemplateColumn Header="سعر الشراء" Width="95" MinWidth="85">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding PurchasePrice, StringFormat='{}{0:N2} ج.م'}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" />
@@ -250,7 +257,7 @@
                         </DataGridTemplateColumn>
 
                         <!-- سعر البيع للجمهور -->
-                        <DataGridTemplateColumn Header="سعر البيع" Width="100">
+                        <DataGridTemplateColumn Header="سعر البيع" Width="100" MinWidth="90">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding SellingPrice, StringFormat='{}{0:N2} ج.م'}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" />
@@ -259,7 +266,7 @@
                         </DataGridTemplateColumn>
 
                         <!-- الكمية المتوفرة للبيع -->
-                        <DataGridTemplateColumn Header="المتاح للبيع" Width="85">
+                        <DataGridTemplateColumn Header="المتاح للبيع" Width="85" MinWidth="72">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Quantity}" 
@@ -272,7 +279,7 @@
                         </DataGridTemplateColumn>
 
                         <!-- مخزون التالف -->
-                        <DataGridTemplateColumn Header="مخزون التالف" Width="85">
+                        <DataGridTemplateColumn Header="مخزون التالف" Width="85" MinWidth="72">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border Background="#F1F5F9" CornerRadius="4" Padding="4,2" HorizontalAlignment="Center">
@@ -287,7 +294,7 @@
                         </DataGridTemplateColumn>
 
                         <!-- حد الطلب الأدنى -->
-                        <DataGridTemplateColumn Header="حد الطلب" Width="75">
+                        <DataGridTemplateColumn Header="حد الطلب" Width="75" MinWidth="64">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding MinimumStock}" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" />
@@ -296,18 +303,19 @@
                         </DataGridTemplateColumn>
 
                         <!-- حالة المخزون -->
-                        <DataGridTemplateColumn Header="الحالة" Width="90">
+                        <DataGridTemplateColumn Header="الحالة" Width="90" MinWidth="80">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border CornerRadius="6" Padding="6,3" HorizontalAlignment="Left" Background="#F8FAFC">
-                                        <TextBlock Text="{Binding StockStatusText}" FontSize="11" FontWeight="Bold" Foreground="{Binding StockStatusColor}" />
+                                    <Border CornerRadius="6" Padding="6,3" HorizontalAlignment="Stretch" Background="#F8FAFC">
+                                        <TextBlock Text="{Binding StockStatusText}" FontSize="11" FontWeight="Bold" Foreground="{Binding StockStatusColor}"
+                                                   TextTrimming="CharacterEllipsis" ToolTip="{Binding StockStatusText}" />
                                     </Border>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
                         <!-- عمود الإجراءات السريعة في السطر -->
-                        <DataGridTemplateColumn Header="إجراءات" Width="110">
+                        <DataGridTemplateColumn Header="إجراءات" Width="120" MinWidth="110">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
