@@ -1,5 +1,16 @@
 ﻿# CarPartManager - Handover Document
 
+## Latest: Responsive DataGrid column sizing ? branch `fix-layout`
+**Date:** 2026-10-28
+
+**Changes:** `Views/InventoryView.xaml` now gives long-text columns in the stock overview, movement log, and stocktake lines flexible star sizing with minimum widths. The stock name receives more room in the overview; numeric/date columns remain fixed, and the grids retain automatic horizontal scrolling and the existing trimming/tooltips.
+
+**Review:** Sales and purchase invoice-history grids already use bounded `Grid` rows, automatic horizontal scrolling, minimum widths for every column, flexible customer/supplier/notes columns, and ellipsis/tooltips for long values; no additional XAML change was warranted there. Products, customers, expenses, reports, and POS item grids were also reviewed; no matching unbounded-grid or column-sizing defect was found, so they were left unchanged.
+
+**Build:** `dotnet build CarPartManager.csproj` ? **Build succeeded, 0 Error(s), 8 Warning(s)**. The warnings are existing `CS8602` nullable dereference warnings in `ViewModels/InventoryViewModel.cs:218?221`. The app was not run and no `.db` file was touched.
+
+**Manual verification required:** At the default window size (1340?820) and the minimum supported size (1040?680), resize through the inventory overview, movements, and stocktake grids, plus sales and purchase invoice history. Confirm column boundaries stay distinct, long text trims with a tooltip, and horizontal scrolling appears where the minimum column widths exceed the viewport. Also spot-check products, customers, expenses, reports, and POS item grids at the minimum size.
+
 ## Latest: Stocktake tab did nothing after creating a session — FIXED (branch `fix-stocktake`)
 **Date:** 2026-10-27
 **Symptom:** "الجرد" tab: a session could be created and opened, but counting/adding a product did nothing — no row appeared and no message was shown. Reproduced on a fresh database.
