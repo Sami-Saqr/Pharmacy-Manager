@@ -157,6 +157,15 @@
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
     </Style>
 
+    <!-- نمط نص خلايا الجداول: قصّ النص الطويل مع "…" وإظهاره كاملاً في تلميح (ToolTip)
+         يُطبَّق على أعمدة النصوص الطويلة (الاسم / الملاحظات / البيان ...) عبر ElementStyle -->
+    <Style x:Key="DataGridTextCellStyle" TargetType="TextBlock">
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        <Setter Property="TextWrapping" Value="NoWrap" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
+    </Style>
+
     <!-- نمط ترويسة الأعمدة في الجداول -->
     <Style TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="#F8FAFC" />
@@ -169,6 +178,19 @@
         <Setter Property="BorderThickness" Value="0,0,0,1" />
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <!-- يمنع نص الترويسة الطويل من الامتداد فوق العمود المجاور عند تصغير النافذة -->
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}"
+                               TextTrimming="CharacterEllipsis"
+                               TextWrapping="NoWrap"
+                               VerticalAlignment="Center"
+                               ToolTip="{Binding}" />
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- نمط خلايا الجداول -->
@@ -178,8 +200,10 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="DataGridCell">
+                    <!-- ClipToBounds: يمنع محتوى الخلية الأطول من العرض أن يُرسم فوق العمود المجاور -->
                     <Border Background="{TemplateBinding Background}"
                             BorderThickness="0"
+                            ClipToBounds="True"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter VerticalAlignment="Center" 
                                           TextElement.Foreground="{TemplateBinding Foreground}" />
