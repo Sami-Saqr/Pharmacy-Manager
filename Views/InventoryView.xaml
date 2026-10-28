@@ -191,20 +191,28 @@
                                   ItemsSource="{Binding StockProducts}"
                                   SelectedItem="{Binding SelectedStockProduct, Mode=TwoWay}"
                                   RowHeight="48"
-                                  SelectionMode="Single">
+                                  SelectionMode="Single"
+                                  HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Auto">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="الاسم" Binding="{Binding Name}" Width="2*" />
-                                <DataGridTextColumn Header="الباركود" Binding="{Binding Barcode}" Width="120" />
-                                <DataGridTextColumn Header="التصنيف" Binding="{Binding Category}" Width="120" />
-                                <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="80" />
-                                <DataGridTextColumn Header="حد الطلب" Binding="{Binding MinimumStock}" Width="80" />
-                                <DataGridTextColumn Header="سعر التكلفة" Binding="{Binding CostPrice, StringFormat='{}{0:N2}'}" Width="100" />
-                                <DataGridTextColumn Header="قيمة المخزون" Binding="{Binding StockValue, StringFormat='{}{0:N2}'}" Width="100" />
-                                <DataGridTemplateColumn Header="الحالة" Width="100">
+                                <DataGridTextColumn Header="الاسم" Binding="{Binding Name}" Width="*" MinWidth="180"
+                                                    ElementStyle="{StaticResource DataGridTextCellStyle}" />
+                                <DataGridTextColumn Header="الباركود" Binding="{Binding Barcode}" Width="120" MinWidth="90"
+                                                    ElementStyle="{StaticResource DataGridTextCellStyle}" />
+                                <DataGridTextColumn Header="التصنيف" Binding="{Binding Category}" Width="120" MinWidth="90"
+                                                    ElementStyle="{StaticResource DataGridTextCellStyle}" />
+                                <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="80" MinWidth="64" />
+                                <DataGridTextColumn Header="حد الطلب" Binding="{Binding MinimumStock}" Width="80" MinWidth="64" />
+                                <DataGridTextColumn Header="سعر التكلفة" Binding="{Binding CostPrice, StringFormat='{}{0:N2}'}" Width="100" MinWidth="80" />
+                                <DataGridTextColumn Header="قيمة المخزون" Binding="{Binding StockValue, StringFormat='{}{0:N2}'}" Width="100" MinWidth="80" />
+                                <DataGridTemplateColumn Header="الحالة" Width="100" MinWidth="90">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <Border CornerRadius="4" Padding="6,3" HorizontalAlignment="Left">
-                                                <TextBlock Text="{Binding Status}" FontSize="11" FontWeight="Bold" Foreground="{Binding StatusColor}" />
+                                                <TextBlock Text="{Binding Status}" FontSize="11" FontWeight="Bold"
+                                                           Foreground="{Binding StatusColor}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           ToolTip="{Binding Status}" />
                                             </Border>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -335,16 +343,22 @@
                                       ItemsSource="{Binding Movements}"
                                       SelectedItem="{Binding SelectedMovement, Mode=TwoWay}"
                                       RowHeight="42"
-                                      SelectionMode="Single">
+                                      SelectionMode="Single"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Auto">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="التاريخ" Binding="{Binding MovementDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Width="140" />
-                                    <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="2*" />
-                                    <DataGridTextColumn Header="النوع" Binding="{Binding MovementType}" Width="180" />
-                                    <DataGridTextColumn Header="التغيير" Binding="{Binding QuantityChange, StringFormat='{}{0:+0;-0}'}" Width="80" />
-                                    <DataGridTextColumn Header="قبل" Binding="{Binding PreviousQuantity}" Width="70" />
-                                    <DataGridTextColumn Header="بعد" Binding="{Binding NewQuantity}" Width="70" />
-                                    <DataGridTextColumn Header="المرجع" Binding="{Binding ReferenceNumber}" Width="120" />
-                                    <DataGridTextColumn Header="ملاحظات" Binding="{Binding Notes}" Width="2*" />
+                                    <DataGridTextColumn Header="التاريخ" Binding="{Binding MovementDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Width="150" MinWidth="140" />
+                                    <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="2*" MinWidth="180"
+                                                        ElementStyle="{StaticResource DataGridTextCellStyle}" />
+                                    <DataGridTextColumn Header="النوع" Binding="{Binding MovementType}" Width="160" MinWidth="120"
+                                                        ElementStyle="{StaticResource DataGridTextCellStyle}" />
+                                    <DataGridTextColumn Header="التغيير" Binding="{Binding QuantityChange, StringFormat='{}{0:+0;-0}'}" Width="80" MinWidth="64" />
+                                    <DataGridTextColumn Header="قبل" Binding="{Binding PreviousQuantity}" Width="70" MinWidth="60" />
+                                    <DataGridTextColumn Header="بعد" Binding="{Binding NewQuantity}" Width="70" MinWidth="60" />
+                                    <DataGridTextColumn Header="المرجع" Binding="{Binding ReferenceNumber}" Width="120" MinWidth="90"
+                                                        ElementStyle="{StaticResource DataGridTextCellStyle}" />
+                                    <DataGridTextColumn Header="ملاحظات" Binding="{Binding Notes}" Width="2*" MinWidth="160"
+                                                        ElementStyle="{StaticResource DataGridTextCellStyle}" />
                                 </DataGrid.Columns>
                             </DataGrid>
 
@@ -524,19 +538,26 @@
                                   ItemsSource="{Binding StocktakeLines}"
                                   SelectedItem="{Binding SelectedStocktakeLine, Mode=TwoWay}"
                                   RowHeight="42"
-                                  SelectionMode="Single">
+                                  SelectionMode="Single"
+                                  HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Auto">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="الاسم" Binding="{Binding ProductName}" Width="2*" />
-                                <DataGridTextColumn Header="الباركود" Binding="{Binding Barcode}" Width="120" />
-                                <DataGridTextColumn Header="الرصيد وقت العد" Binding="{Binding BookQuantity}" Width="100" />
-                                <DataGridTextColumn Header="المعدود" Binding="{Binding CountedQuantity}" Width="80" />
-                                <DataGridTextColumn Header="الفرق" Binding="{Binding Difference, StringFormat='{}{0:+0;-0}'}" Width="70" />
-                                <DataGridTextColumn Header="قيمة الفرق" Binding="{Binding DifferenceValue, StringFormat='{}{0:N2}'}" Width="100" />
-                                <DataGridTemplateColumn Header="الحالة" Width="100">
+                                <DataGridTextColumn Header="الاسم" Binding="{Binding ProductName}" Width="*" MinWidth="180"
+                                                    ElementStyle="{StaticResource DataGridTextCellStyle}" />
+                                <DataGridTextColumn Header="الباركود" Binding="{Binding Barcode}" Width="120" MinWidth="90"
+                                                    ElementStyle="{StaticResource DataGridTextCellStyle}" />
+                                <DataGridTextColumn Header="الرصيد وقت العد" Binding="{Binding BookQuantity}" Width="110" MinWidth="90" />
+                                <DataGridTextColumn Header="المعدود" Binding="{Binding CountedQuantity}" Width="80" MinWidth="64" />
+                                <DataGridTextColumn Header="الفرق" Binding="{Binding Difference, StringFormat='{}{0:+0;-0}'}" Width="70" MinWidth="60" />
+                                <DataGridTextColumn Header="قيمة الفرق" Binding="{Binding DifferenceValue, StringFormat='{}{0:N2}'}" Width="100" MinWidth="80" />
+                                <DataGridTemplateColumn Header="الحالة" Width="110" MinWidth="90">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <Border CornerRadius="4" Padding="6,3" HorizontalAlignment="Left">
-                                                <TextBlock Text="{Binding DifferenceType}" FontSize="11" FontWeight="Bold" Foreground="{Binding DifferenceColor}" />
+                                                <TextBlock Text="{Binding DifferenceType}" FontSize="11" FontWeight="Bold"
+                                                           Foreground="{Binding DifferenceColor}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           ToolTip="{Binding DifferenceType}" />
                                             </Border>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -582,16 +603,23 @@
                                       Style="{StaticResource CleanDataGridStyle}"
                                       ItemsSource="{Binding StocktakeHistory}"
                                       RowHeight="40"
-                                      SelectionMode="Single">
+                                      SelectionMode="Single"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Auto">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="رقم الجلسة" Binding="{Binding SessionNumber}" Width="120" />
-                                    <DataGridTextColumn Header="الاسم" Binding="{Binding Name}" Width="2*" />
-                                    <DataGridTextColumn Header="التاريخ" Binding="{Binding SessionDate, StringFormat='{}{0:yyyy-MM-dd}'}" Width="100" />
-                                    <DataGridTemplateColumn Header="الحالة" Width="100">
+                                    <DataGridTextColumn Header="رقم الجلسة" Binding="{Binding SessionNumber}" Width="130" MinWidth="110"
+                                                        ElementStyle="{StaticResource DataGridTextCellStyle}" />
+                                    <DataGridTextColumn Header="الاسم" Binding="{Binding Name}" Width="*" MinWidth="160"
+                                                        ElementStyle="{StaticResource DataGridTextCellStyle}" />
+                                    <DataGridTextColumn Header="التاريخ" Binding="{Binding SessionDate, StringFormat='{}{0:yyyy-MM-dd}'}" Width="110" MinWidth="100" />
+                                    <DataGridTemplateColumn Header="الحالة" Width="110" MinWidth="90">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <Border CornerRadius="4" Padding="6,3" HorizontalAlignment="Left">
-                                                    <TextBlock Text="{Binding StatusText}" FontSize="11" FontWeight="Bold" Foreground="{Binding StatusColor}" />
+                                                    <TextBlock Text="{Binding StatusText}" FontSize="11" FontWeight="Bold"
+                                                               Foreground="{Binding StatusColor}"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               ToolTip="{Binding StatusText}" />
                                                 </Border>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
