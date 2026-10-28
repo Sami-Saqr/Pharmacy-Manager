@@ -179,7 +179,6 @@ namespace CarPartManager.ViewModels
             // الاشتراك في حدث تحديث البيانات المركزي لتحديث لوحة التحكم تلقائياً
             DataEvents.InventoryOrInvoicesChanged += OnExternalDataChanged;
 
-            _ = LoadDashboardDataAsync();
         }
 
         private void OnExternalDataChanged()

@@ -247,7 +247,6 @@ namespace CarPartManager.ViewModels
             ClearPurchaseReturnCommand = new RelayCommand(ClearPurchaseReturnForm);
             RefreshAllCommand = new RelayCommand(async () => await LoadAllDataAsync());
 
-            _ = LoadAllDataAsync();
         }
 
         public bool CanPostSalesReturn =>

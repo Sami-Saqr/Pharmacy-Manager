@@ -223,7 +223,6 @@ namespace CarPartManager.ViewModels
             CountByBarcodeCommand = new RelayCommand(async () => await ExecuteCountByBarcodeAsync());
             RefreshStocktakeCommand = new RelayCommand(async () => await RefreshStocktakeAsync());
 
-            _ = LoadAllDataAsync();
         }
 
         public async Task LoadAllDataAsync()

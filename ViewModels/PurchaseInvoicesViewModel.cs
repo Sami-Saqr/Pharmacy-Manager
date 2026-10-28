@@ -200,10 +200,9 @@ namespace CarPartManager.ViewModels
             });
             RefreshCommand = new RelayCommand(async () => await LoadAllDataAsync());
 
-            _ = InitializeAsync();
         }
 
-        private async Task InitializeAsync()
+        public async Task InitializeAsync()
         {
             await LoadAllDataAsync();
             await PrepareNewInvoiceAsync();

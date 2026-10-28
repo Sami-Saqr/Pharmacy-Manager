@@ -110,7 +110,6 @@ namespace CarPartManager.ViewModels
             DeleteSupplierCommand = new RelayCommand(async () => await ExecuteDeleteSupplierAsync(), () => HasSelectedSupplier);
             RefreshCommand = new RelayCommand(async () => await LoadSuppliersAsync());
 
-            _ = LoadSuppliersAsync();
         }
 
         public async Task LoadSuppliersAsync()

@@ -321,7 +321,6 @@ namespace CarPartManager.ViewModels
             DataEvents.CustomersChanged += OnExternalCustomersChanged;
             DataEvents.InventoryOrInvoicesChanged += OnExternalCustomersChanged;
 
-            _ = LoadCustomersAsync();
         }
 
         private void OnExternalCustomersChanged()

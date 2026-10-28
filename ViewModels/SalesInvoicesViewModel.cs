@@ -16,7 +16,6 @@ namespace CarPartManager.ViewModels
         private readonly ISalesInvoiceService _invoiceService;
         private readonly IProductService _productService;
         private readonly ICustomerService _customerService;
-        private readonly Task _initializationTask;
 
         private readonly List<ProductModel> _allProducts = new();
         private readonly List<SalesInvoiceModel> _allInvoices = new();
@@ -489,7 +488,6 @@ namespace CarPartManager.ViewModels
 
             CurrentInvoiceItems.CollectionChanged += OnCurrentInvoiceItemsCollectionChanged;
 
-            _initializationTask = InitializeAsync();
         }
 
         private void OnCurrentInvoiceItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -521,7 +519,7 @@ namespace CarPartManager.ViewModels
             }
         }
 
-        private async Task InitializeAsync()
+        public async Task InitializeAsync()
         {
             try
             {
@@ -1315,4 +1313,3 @@ namespace CarPartManager.ViewModels
         }
     }
 }
-

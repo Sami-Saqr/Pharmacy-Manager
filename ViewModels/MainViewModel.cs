@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Threading;
 using CarPartManager.Models;
 using CarPartManager.MVVM;
 using CarPartManager.Views;
@@ -62,7 +64,18 @@ namespace CarPartManager.ViewModels
         private readonly CustomersViewModel _customersViewModel;
         private readonly ExpensesViewModel _expensesViewModel;
         private readonly ReportsViewModel _reportsViewModel;
+        private readonly HashSet<ViewModelBase> _loadedViewModels = new();
+        private readonly HashSet<ViewModelBase> _loadingViewModels = new();
+        private readonly HashSet<ViewModelBase> _pendingRefreshes = new();
         private readonly Dictionary<string, PlaceholderViewModel> _placeholderCache = new();
+        private int _navigationRequest;
+
+        private bool _isNavigationLoading;
+        public bool IsNavigationLoading
+        {
+            get => _isNavigationLoading;
+            private set => SetProperty(ref _isNavigationLoading, value);
+        }
 
         public MainViewModel()
         {
@@ -112,10 +125,14 @@ namespace CarPartManager.ViewModels
                     }
                 }
             });
+
+            NavigateTo(NavigationItems[0]);
         }
 
         private void NavigateTo(NavItem selectedItem)
         {
+            var previousViewModel = CurrentViewModel;
+
             // تحديث حالة الاختيار لجميع العناصر
             foreach (var item in NavigationItems)
             {
@@ -124,85 +141,93 @@ namespace CarPartManager.ViewModels
 
             if (selectedItem.Tag == "Dashboard")
             {
-                _ = _dashboardViewModel.LoadDashboardDataAsync();
                 CurrentViewModel = _dashboardViewModel;
+                QueueLoad(_dashboardViewModel, _dashboardViewModel.LoadDashboardDataAsync, previousViewModel);
                 return;
             }
 
             if (selectedItem.Tag == "Products")
             {
-                _ = _productsViewModel.LoadProductsAsync();
                 CurrentViewModel = _productsViewModel;
+                QueueLoad(_productsViewModel, _productsViewModel.LoadProductsAsync, previousViewModel);
                 return;
             }
 
             if (selectedItem.Tag == "Inventory")
             {
-                _ = _inventoryViewModel.LoadAllDataAsync();
                 CurrentViewModel = _inventoryViewModel;
+                QueueLoad(_inventoryViewModel, _inventoryViewModel.LoadAllDataAsync, previousViewModel);
                 return;
             }
 
             if (selectedItem.Tag == "PurchaseInvoices")
             {
-                _ = _purchaseInvoicesViewModel.LoadAllDataAsync();
                 CurrentViewModel = _purchaseInvoicesViewModel;
+                QueueLoad(
+                    _purchaseInvoicesViewModel,
+                    _purchaseInvoicesViewModel.InitializeAsync,
+                    _purchaseInvoicesViewModel.LoadAllDataAsync,
+                    previousViewModel);
                 return;
             }
 
             if (selectedItem.Tag == "PurchaseInvoicesHistory")
             {
-                _ = _purchaseInvoicesHistoryViewModel.LoadAllDataAsync();
                 CurrentViewModel = _purchaseInvoicesHistoryViewModel;
+                QueueLoad(_purchaseInvoicesHistoryViewModel, _purchaseInvoicesHistoryViewModel.LoadAllDataAsync, previousViewModel);
                 return;
             }
 
             if (selectedItem.Tag == "SalesInvoices" || selectedItem.Tag == "POS")
             {
-                _ = _salesInvoicesViewModel.LoadAllDataAsync();
                 CurrentViewModel = _salesInvoicesViewModel;
+                QueueLoad(
+                    _salesInvoicesViewModel,
+                    _salesInvoicesViewModel.InitializeAsync,
+                    _salesInvoicesViewModel.LoadAllDataAsync,
+                    previousViewModel);
                 return;
             }
 
             if (selectedItem.Tag == "SalesInvoicesHistory")
             {
-                _ = _salesInvoicesHistoryViewModel.LoadAllDataAsync();
                 CurrentViewModel = _salesInvoicesHistoryViewModel;
+                QueueLoad(_salesInvoicesHistoryViewModel, _salesInvoicesHistoryViewModel.LoadAllDataAsync, previousViewModel);
                 return;
             }
 
             if (selectedItem.Tag == "Suppliers")
             {
-                _ = _suppliersViewModel.LoadSuppliersAsync();
                 CurrentViewModel = _suppliersViewModel;
+                QueueLoad(_suppliersViewModel, _suppliersViewModel.LoadSuppliersAsync, previousViewModel);
                 return;
             }
 
             if (selectedItem.Tag == "Returns")
             {
-                _ = _returnsViewModel.LoadAllDataAsync();
                 CurrentViewModel = _returnsViewModel;
+                QueueLoad(_returnsViewModel, _returnsViewModel.LoadAllDataAsync, previousViewModel);
                 return;
             }
 
             if (selectedItem.Tag == "Customers")
             {
-                _ = _customersViewModel.LoadCustomersAsync();
                 CurrentViewModel = _customersViewModel;
+                QueueLoad(_customersViewModel, () => _customersViewModel.LoadCustomersAsync(), previousViewModel);
                 return;
             }
 
             if (selectedItem.Tag == "Expenses")
             {
-                _ = _expensesViewModel.LoadAllDataAsync();
                 CurrentViewModel = _expensesViewModel;
+                QueueLoad(_expensesViewModel, _expensesViewModel.LoadAllDataAsync, previousViewModel);
                 return;
             }
 
             if (selectedItem.Tag == "Reports")
             {
-                _ = _reportsViewModel.LoadAllAsync();
                 CurrentViewModel = _reportsViewModel;
+                QueueLoad(_reportsViewModel, _reportsViewModel.LoadAllAsync, previousViewModel);
                 return;
             }
 
@@ -223,6 +248,88 @@ namespace CarPartManager.ViewModels
             }
 
             CurrentViewModel = placeholder;
+            IsNavigationLoading = false;
+        }
+
+        private void QueueLoad(
+            ViewModelBase viewModel,
+            Func<Task> initialLoad,
+            Func<Task> refresh,
+            ViewModelBase previousViewModel)
+        {
+            var request = ++_navigationRequest;
+
+            if (_loadingViewModels.Contains(viewModel))
+            {
+                if (!ReferenceEquals(previousViewModel, viewModel))
+                {
+                    _pendingRefreshes.Add(viewModel);
+                }
+
+                IsNavigationLoading = true;
+                return;
+            }
+
+            IsNavigationLoading = false;
+            Application.Current.Dispatcher.BeginInvoke(
+                DispatcherPriority.Background,
+                new Action(() =>
+                {
+                    if (request != _navigationRequest || !ReferenceEquals(CurrentViewModel, viewModel))
+                    {
+                        return;
+                    }
+
+                    _ = RunLoadAsync(viewModel, initialLoad, refresh);
+                }));
+        }
+
+        private void QueueLoad(ViewModelBase viewModel, Func<Task> load, ViewModelBase previousViewModel)
+        {
+            QueueLoad(viewModel, load, load, previousViewModel);
+        }
+
+        private async Task RunLoadAsync(ViewModelBase viewModel, Func<Task> initialLoad, Func<Task> refresh)
+        {
+            if (!_loadingViewModels.Add(viewModel))
+            {
+                return;
+            }
+
+            if (ReferenceEquals(CurrentViewModel, viewModel))
+            {
+                IsNavigationLoading = true;
+            }
+
+            try
+            {
+                await (_loadedViewModels.Contains(viewModel) ? refresh() : initialLoad());
+                _loadedViewModels.Add(viewModel);
+            }
+            catch (Exception ex)
+            {
+                if (ReferenceEquals(CurrentViewModel, viewModel))
+                {
+                    MessageBox.Show(
+                        $"تعذر تحميل بيانات الشاشة:\n{ex.Message}",
+                        "خطأ في التحميل",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+            }
+            finally
+            {
+                _loadingViewModels.Remove(viewModel);
+                if (_pendingRefreshes.Remove(viewModel) && ReferenceEquals(CurrentViewModel, viewModel))
+                {
+                    QueueLoad(viewModel, initialLoad, refresh, viewModel);
+                    IsNavigationLoading = true;
+                }
+                else if (ReferenceEquals(CurrentViewModel, viewModel))
+                {
+                    IsNavigationLoading = false;
+                }
+            }
         }
     }
 }

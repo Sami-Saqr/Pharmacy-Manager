@@ -93,7 +93,6 @@ namespace CarPartManager.ViewModels
             DeleteProductCommand = new RelayCommand(ExecuteDeleteProduct, () => HasSelectedProduct);
             RefreshCommand = new RelayCommand(async () => await LoadProductsAsync());
 
-            _ = LoadProductsAsync();
         }
 
         /// <summary>
