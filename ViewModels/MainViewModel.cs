@@ -184,7 +184,9 @@ namespace CarPartManager.ViewModels
                 QueueLoad(
                     _salesInvoicesViewModel,
                     _salesInvoicesViewModel.InitializeAsync,
-                    _salesInvoicesViewModel.LoadAllDataAsync,
+                    () => _salesInvoicesViewModel.IsInitialized
+                        ? _salesInvoicesViewModel.LoadAllDataAsync()
+                        : _salesInvoicesViewModel.InitializeAsync(),
                     previousViewModel);
                 return;
             }

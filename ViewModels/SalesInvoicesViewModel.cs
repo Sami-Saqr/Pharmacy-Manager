@@ -19,6 +19,7 @@ namespace CarPartManager.ViewModels
 
         private readonly List<ProductModel> _allProducts = new();
         private readonly List<SalesInvoiceModel> _allInvoices = new();
+        private bool _hasLoadError;
 
         // القوائم المعروضة
         public ObservableCollection<ProductModel> FilteredAvailableProducts { get; } = new();
@@ -484,7 +485,17 @@ namespace CarPartManager.ViewModels
             CancelInvoiceCommand = new RelayCommand(async () => await ExecuteCancelInvoiceAsync(), () => CanCancelInvoice);
             NewInvoiceCommand = new RelayCommand(async () => await ExecuteClearOrNewInvoiceAsync(), () => IsInitialized);
             ClearInvoiceCommand = new RelayCommand(async () => await ExecuteClearOrNewInvoiceAsync(), () => IsInitialized);
-            RefreshCommand = new RelayCommand(async () => await LoadAllDataAsync());
+            RefreshCommand = new RelayCommand(async () =>
+            {
+                if (IsInitialized)
+                {
+                    await LoadAllDataAsync();
+                }
+                else
+                {
+                    await InitializeAsync();
+                }
+            });
 
             CurrentInvoiceItems.CollectionChanged += OnCurrentInvoiceItemsCollectionChanged;
 
@@ -524,6 +535,8 @@ namespace CarPartManager.ViewModels
             try
             {
                 await LoadAllDataAsync();
+                if (_hasLoadError) return;
+
                 await PrepareNewInvoiceAsync();
                 // IsInitialized setter يستخدم Dispatcher.InvokeAsync داخلياً،
                 // لكن نضمن هنا إضافياً أن الضبط النهائي يصل للـ UI thread
@@ -542,6 +555,7 @@ namespace CarPartManager.ViewModels
 
         public async Task LoadAllDataAsync()
         {
+            _hasLoadError = false;
             try
             {
                 // تحميل الأصناف المتاحة
@@ -551,13 +565,14 @@ namespace CarPartManager.ViewModels
                 FilterProductsDropdown();
 
                 // تحميل أرشيف فواتير المبيعات
-                var invoices = await _invoiceService.GetAllInvoicesAsync();
+                var invoices = await _invoiceService.GetInvoiceSummariesAsync();
                 _allInvoices.Clear();
                 _allInvoices.AddRange(invoices);
                 FilterInvoicesHistory();
             }
             catch (Exception ex)
             {
+                _hasLoadError = true;
                 StatusMessage = $"خطأ في تحميل البيانات: {ex.Message}";
             }
         }
@@ -1237,9 +1252,23 @@ namespace CarPartManager.ViewModels
                 {
                     // Debounce cancelled
                 }
-                catch
+                catch (Exception ex)
                 {
-                    IsLoadingCustomerSuggestions = false;
+                    var message = $"تعذر البحث عن العملاء: {ex.Message}";
+                    if (System.Windows.Application.Current?.Dispatcher != null)
+                    {
+                        await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                        {
+                            IsLoadingCustomerSuggestions = false;
+                            StatusMessage = message;
+                            ShowMessageBox(message, "خطأ في البحث", MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
+                    }
+                    else
+                    {
+                        IsLoadingCustomerSuggestions = false;
+                        StatusMessage = message;
+                    }
                 }
             }, cts.Token);
         }

@@ -86,7 +86,7 @@ namespace CarPartManager.ViewModels
 
             try
             {
-                var invoices = await _invoiceService.GetAllInvoicesAsync();
+                var invoices = await _invoiceService.GetInvoiceSummariesAsync();
                 _allInvoices.Clear();
                 foreach (var inv in invoices)
                 {

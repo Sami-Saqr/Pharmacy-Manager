@@ -60,6 +60,64 @@ namespace CarPartManager.Services
             }
         }
 
+        public async Task<IEnumerable<SalesInvoiceModel>> GetInvoiceSummariesAsync()
+        {
+            try
+            {
+                using var context = CreateContext();
+                var invoices = await context.SalesInvoices
+                    .AsNoTracking()
+                    .OrderByDescending(s => s.InvoiceDate)
+                    .ThenByDescending(s => s.Id)
+                    .Select(s => new
+                    {
+                        s.Id,
+                        s.InvoiceNumber,
+                        s.InvoiceDate,
+                        s.CustomerId,
+                        s.CustomerName,
+                        s.CustomerPhone,
+                        s.CustomerAddress,
+                        s.Status,
+                        s.SubTotal,
+                        s.Discount,
+                        s.GrandTotal,
+                        s.PaymentMethod,
+                        s.PaidAmount,
+                        s.Notes,
+                        s.PostedDate,
+                        s.CancellationDate,
+                        s.CancellationReason
+                    })
+                    .ToListAsync();
+
+                return invoices.Select(s => new SalesInvoiceModel
+                {
+                    Id = s.Id,
+                    InvoiceNumber = s.InvoiceNumber,
+                    InvoiceDate = s.InvoiceDate,
+                    CustomerId = s.CustomerId,
+                    CustomerName = s.CustomerName,
+                    CustomerPhone = s.CustomerPhone,
+                    CustomerAddress = s.CustomerAddress,
+                    Status = s.Status,
+                    SubTotal = s.SubTotal,
+                    Discount = s.Discount,
+                    GrandTotal = s.GrandTotal,
+                    PaymentMethod = s.PaymentMethod,
+                    PaidAmount = s.PaidAmount,
+                    Notes = s.Notes,
+                    PostedDate = s.PostedDate,
+                    CancellationDate = s.CancellationDate,
+                    CancellationReason = s.CancellationReason
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"تعذر تحميل ملخصات فواتير المبيعات: {ex.Message}", ex);
+            }
+        }
+
         public async Task<SalesInvoiceModel?> GetInvoiceByIdAsync(int id)
         {
             try
@@ -324,11 +382,14 @@ namespace CarPartManager.Services
                     await context.SaveChangesAsync();
                 }
 
+                var productsById = await context.Products
+                    .Where(p => itemProductIds.Contains(p.Id))
+                    .ToDictionaryAsync(p => p.Id);
+
                 // 2. التحقق الدقيق من رصيد كل صنف في المخزن والخصم الذري
                 foreach (var line in targetInvoice.Items)
                 {
-                    var product = await context.Products.FirstOrDefaultAsync(p => p.Id == line.ProductId);
-                    if (product == null)
+                    if (!productsById.TryGetValue(line.ProductId, out var product))
                     {
                         throw new InvalidOperationException($"الصنف ذو المعرف ({line.ProductId}) غير موجود في قاعدة بيانات الأصناف.");
                     }
