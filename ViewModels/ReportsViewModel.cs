@@ -9,7 +9,7 @@ namespace CarPartManager.ViewModels
     /// نموذج عرض شاشة التقارير المحاسبية (الجزء أ): مرشّح تاريخي عام + ملخص الأرباح + تقرير المبيعات + تقرير المصروفات.
     /// الشاشة للقراءة فقط ولا تُعدّل أي بيانات.
     /// </summary>
-    public class ReportsViewModel : ViewModelBase
+    public class ReportsViewModel : ExcelExportViewModelBase
     {
         private const string PresetToday = "اليوم";
         private const string PresetWeek = "الأسبوع";
@@ -28,7 +28,10 @@ namespace CarPartManager.ViewModels
         /// <summary>يمنع إعادة تحميل تبويب تقييم المخزون قبل أول تحميل كامل للشاشة</summary>
         private bool _hasLoadedOnce;
 
-        public ReportsViewModel(IReportsService? reportsService = null)
+        public ReportsViewModel(
+            IReportsService? reportsService = null,
+            IExcelExportService? excelExportService = null)
+            : base(excelExportService)
         {
             _reportsService = reportsService ?? new SqliteReportsService();
 
@@ -125,6 +128,7 @@ namespace CarPartManager.ViewModels
                     OnPropertyChanged(nameof(ShowInventoryEmptyState));
                     OnPropertyChanged(nameof(ShowCustomerDebtsEmptyState));
                     OnPropertyChanged(nameof(ShowItemProfitEmptyState));
+                    OnPropertyChanged(nameof(CanExport));
                 }
             }
         }
@@ -363,6 +367,47 @@ namespace CarPartManager.ViewModels
         private string _itemProfitNoteText = string.Empty;
 
         public bool ShowItemProfitEmptyState => !IsLoading && ItemProfitRows.Count == 0;
+        public override bool CanExport => base.CanExport && !IsLoading &&
+            (HasProfitData || DailySales.Count > 0 || ExpenseDetails.Count > 0 ||
+             PurchasesDaily.Count > 0 || InventoryRows.Count > 0 ||
+             CustomerDebtRows.Count > 0 || ItemProfitRows.Count > 0);
+
+        public Task<bool> ExportReportsAsync(string destinationPath, string shopName)
+        {
+            var validPeriod = TryResolvePeriod(out var from, out var toExclusive);
+            var stagnantDays = StagnantDays;
+            return ExportWorkbookAsync(async () =>
+            {
+                if (!validPeriod)
+                    throw new InvalidOperationException("نطاق التاريخ المحدد غير صالح.");
+
+                var profitTask = _reportsService.GetProfitSummaryAsync(from, toExclusive);
+                var salesTask = _reportsService.GetSalesDailyReportAsync(from, toExclusive);
+                var topProductsTask = _reportsService.GetTopProductsAsync(from, toExclusive, 10);
+                var customersTask = _reportsService.GetSalesByCustomerAsync(from, toExclusive, 20);
+                var expensesTask = _reportsService.GetExpensesReportAsync(from, toExclusive);
+                var purchasesTask = _reportsService.GetPurchasesReportAsync(from, toExclusive);
+                var inventoryTask = _reportsService.GetInventoryValuationAsync(stagnantDays, 10);
+                var debtsTask = _reportsService.GetCustomerDebtsAsync();
+                var profitabilityTask = _reportsService.GetItemProfitabilityAsync(from, toExclusive, 10);
+                await Task.WhenAll(profitTask, salesTask, topProductsTask, customersTask, expensesTask,
+                    purchasesTask, inventoryTask, debtsTask, profitabilityTask);
+
+                return PartBExcelExportMappers.Reports(
+                    shopName,
+                    from,
+                    toExclusive,
+                    profitTask.Result,
+                    salesTask.Result,
+                    topProductsTask.Result,
+                    customersTask.Result,
+                    expensesTask.Result,
+                    purchasesTask.Result,
+                    inventoryTask.Result,
+                    debtsTask.Result,
+                    profitabilityTask.Result);
+            }, destinationPath);
+        }
 
         // ── التحميل ───────────────────────────────────────────────────────────
 

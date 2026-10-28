@@ -30,6 +30,9 @@ namespace CarPartManager.ViewModels
             base.OnExportStateChanged();
             OnPropertyChanged(nameof(CanExportStock));
             OnPropertyChanged(nameof(CanExportMovements));
+            OnPropertyChanged(nameof(CanExportStocktakeSession));
+            OnPropertyChanged(nameof(CanExportBlankStocktake));
+            OnPropertyChanged(nameof(StocktakeExportToolTip));
             OnPropertyChanged(nameof(StockExportToolTip));
             OnPropertyChanged(nameof(MovementsExportToolTip));
         }
@@ -483,6 +486,9 @@ namespace CarPartManager.ViewModels
                 {
                     OnPropertyChanged(nameof(HasCurrentSession));
                     OnPropertyChanged(nameof(CanCreateNewSession));
+                    OnPropertyChanged(nameof(CanExportStocktakeSession));
+                    OnPropertyChanged(nameof(CanExportBlankStocktake));
+                    OnPropertyChanged(nameof(StocktakeExportToolTip));
                     OnPropertyChanged(nameof(SessionStatusText));
                     OnPropertyChanged(nameof(SessionStatusColor));
                 }
@@ -498,8 +504,69 @@ namespace CarPartManager.ViewModels
         public ObservableCollection<StocktakeLineModel> StocktakeLines { get; } = new();
         public ObservableCollection<StocktakeSessionModel> StocktakeHistory { get; } = new();
 
+        private StocktakeSessionModel? _selectedStocktakeSession;
+        public StocktakeSessionModel? SelectedStocktakeSession
+        {
+            get => _selectedStocktakeSession;
+            set
+            {
+                if (SetProperty(ref _selectedStocktakeSession, value))
+                {
+                    _hasSelectedStocktakeLines = false;
+                    OnPropertyChanged(nameof(CanExportStocktakeSession));
+                    OnPropertyChanged(nameof(CanExportBlankStocktake));
+                    OnPropertyChanged(nameof(StocktakeExportToolTip));
+                    if (value != null)
+                        _ = LoadSelectedStocktakeLinesAsync(value);
+                }
+            }
+        }
+
+        private bool _hasSelectedStocktakeLines;
+        public bool CanExportStocktakeSession => !IsExporting &&
+            (SelectedStocktakeSession != null ? _hasSelectedStocktakeLines : CurrentSession != null && _allStocktakeLines.Count > 0);
+        public bool CanExportBlankStocktake => CanExportStocktakeSession;
+        public string StocktakeExportToolTip => CanExportStocktakeSession
+            ? "تصدير بيانات جلسة الجرد المحددة"
+            : "لا توجد بيانات للتصدير";
+
         /// <summary>كل بنود الجلسة المحمّلة، ويُعرض منها في الجدول ما يطابق نص البحث فقط.</summary>
         private readonly List<StocktakeLineModel> _allStocktakeLines = new();
+
+        public Task<bool> ExportStocktakeSessionAsync(string destinationPath, string shopName)
+        {
+            var selectedSession = SelectedStocktakeSession ?? CurrentSession;
+            return ExportWorkbookAsync(async () =>
+            {
+                var session = selectedSession
+                    ?? throw new InvalidOperationException("يرجى تحديد جلسة جرد أولاً.");
+                var persistedSession = await _stocktakeService.GetSessionByIdAsync(session.Id)
+                    ?? throw new InvalidOperationException("جلسة الجرد المحددة لم تعد موجودة.");
+                var lines = (await _stocktakeService.GetLinesAsync(session.Id)).ToList();
+                if (lines.Count == 0)
+                    throw new InvalidOperationException("لا توجد بنود في جلسة الجرد المحددة للتصدير.");
+                return PartBExcelExportMappers.StocktakeSession(shopName, persistedSession, lines);
+            }, destinationPath);
+        }
+
+        public Task<bool> ExportBlankStocktakeAsync(
+            string destinationPath,
+            string shopName,
+            bool showBookQuantity)
+        {
+            var selectedSession = SelectedStocktakeSession ?? CurrentSession;
+            return ExportWorkbookAsync(async () =>
+            {
+                var session = selectedSession
+                    ?? throw new InvalidOperationException("يرجى تحديد جلسة جرد أولاً.");
+                var persistedSession = await _stocktakeService.GetSessionByIdAsync(session.Id)
+                    ?? throw new InvalidOperationException("جلسة الجرد المحددة لم تعد موجودة.");
+                var lines = (await _stocktakeService.GetLinesAsync(session.Id)).ToList();
+                if (lines.Count == 0)
+                    throw new InvalidOperationException("لا توجد أصناف في جلسة الجرد المحددة للطباعة.");
+                return PartBExcelExportMappers.BlankStocktakeSheet(shopName, persistedSession, lines, showBookQuantity);
+            }, destinationPath);
+        }
 
         private StocktakeLineModel? _selectedStocktakeLine;
         public StocktakeLineModel? SelectedStocktakeLine
@@ -598,12 +665,41 @@ namespace CarPartManager.ViewModels
                 var lines = await _stocktakeService.GetLinesAsync(CurrentSession.Id);
                 _allStocktakeLines.Clear();
                 _allStocktakeLines.AddRange(lines);
+                OnPropertyChanged(nameof(CanExportStocktakeSession));
+                OnPropertyChanged(nameof(CanExportBlankStocktake));
+                OnPropertyChanged(nameof(StocktakeExportToolTip));
                 ApplyStocktakeFilter();
             }
             catch (Exception ex)
             {
                 StatusMessage = $"خطأ في تحميل بنود الجرد: {ex.Message}";
                 MessageBox.Show($"تعذر تحميل بنود الجرد:\n{ex.Message}", "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async Task LoadSelectedStocktakeLinesAsync(StocktakeSessionModel session)
+        {
+            try
+            {
+                var lines = await _stocktakeService.GetLinesAsync(session.Id);
+                if (SelectedStocktakeSession?.Id != session.Id)
+                    return;
+
+                _hasSelectedStocktakeLines = lines.Any();
+                OnPropertyChanged(nameof(CanExportStocktakeSession));
+                OnPropertyChanged(nameof(CanExportBlankStocktake));
+                OnPropertyChanged(nameof(StocktakeExportToolTip));
+            }
+            catch (Exception ex)
+            {
+                if (SelectedStocktakeSession?.Id == session.Id)
+                {
+                    _hasSelectedStocktakeLines = false;
+                    OnPropertyChanged(nameof(CanExportStocktakeSession));
+                    OnPropertyChanged(nameof(CanExportBlankStocktake));
+                    OnPropertyChanged(nameof(StocktakeExportToolTip));
+                    StatusMessage = $"تعذر تحميل بنود جلسة الجرد المحددة: {ex.Message}";
+                }
             }
         }
 

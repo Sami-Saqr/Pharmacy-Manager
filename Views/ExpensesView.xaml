@@ -35,6 +35,13 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Style="{StaticResource OutlineButtonStyle}"
+                            Click="ExportExpenses_Click"
+                            IsEnabled="{Binding CanExportExpenses}"
+                            ToolTip="{Binding ExportButtonToolTip}"
+                            Margin="0,0,10,0">
+                        <TextBlock Text="{Binding ExportButtonText}" />
+                    </Button>
                     <Button Style="{StaticResource PrimaryButtonStyle}"
                             Command="{Binding AddExpenseCommand}"
                             Margin="0,0,10,0">

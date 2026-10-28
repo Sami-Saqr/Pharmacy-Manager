@@ -37,6 +37,50 @@ namespace CarPartManager.Views
             await ExcelExportDialog.ExportAsync(owner, fileName, viewModel.ExportMovementsAsync, () => viewModel.ExportErrorMessage);
         }
 
+        private async void ExportStocktakeSession_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is not InventoryViewModel viewModel ||
+                Window.GetWindow(this) is not { } owner)
+            {
+                return;
+            }
+
+            var session = viewModel.SelectedStocktakeSession ?? viewModel.CurrentSession;
+            if (session == null)
+                return;
+
+            var fileName = $"تقرير_الجرد_{session.SessionNumber}_{DateTime.Now:yyyy-MM-dd}.xlsx";
+            await ExcelExportDialog.ExportAsync(owner, fileName, viewModel.ExportStocktakeSessionAsync, () => viewModel.ExportErrorMessage);
+        }
+
+        private async void ExportBlankStocktake_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is not InventoryViewModel viewModel ||
+                Window.GetWindow(this) is not { } owner)
+            {
+                return;
+            }
+
+            var session = viewModel.SelectedStocktakeSession ?? viewModel.CurrentSession;
+            if (session == null)
+                return;
+
+            var showBookQuantity = MessageBox.Show(
+                owner,
+                "هل تريد إظهار الكمية الدفترية في ورقة الجرد؟\nاختر «لا» للجرد الأعمى.",
+                "طباعة ورقة جرد",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question,
+                MessageBoxResult.No) == MessageBoxResult.Yes;
+
+            var fileName = $"ورقة_جرد_{session.SessionNumber}_{DateTime.Now:yyyy-MM-dd}.xlsx";
+            await ExcelExportDialog.ExportAsync(
+                owner,
+                fileName,
+                (path, shopName) => viewModel.ExportBlankStocktakeAsync(path, shopName, showBookQuantity),
+                () => viewModel.ExportErrorMessage);
+        }
+
         /// <summary>
         /// دعم قارئ الباركود: الضغط على Enter في حقل الجرد يحدّث الربط ثم يسجّل العد،
         /// ويُبقي التركيز في الحقل لمواصلة المسح تباعاً. وفي حال ظهور رسالة تحذيرية يعود التركيز للحقل بعد إغلاقها.

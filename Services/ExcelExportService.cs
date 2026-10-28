@@ -38,10 +38,11 @@ namespace CarPartManager.Services
                 {
                     output.Properties.Title = workbook.Title;
                     output.Properties.Author = "CarPartManager";
+                    var usedSheetNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                     foreach (var sheet in workbook.Sheets)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
-                        WriteSheet(output, workbook, sheet, cancellationToken);
+                        WriteSheet(output, workbook, sheet, usedSheetNames, cancellationToken);
                     }
 
                     output.SaveAs(temporaryPath);
@@ -76,6 +77,7 @@ namespace CarPartManager.Services
             XLWorkbook workbook,
             ExcelExportWorkbook definition,
             ExcelExportSheet sheet,
+            ISet<string> usedSheetNames,
             CancellationToken cancellationToken)
         {
             if (sheet.Columns.Count == 0)
@@ -83,7 +85,7 @@ namespace CarPartManager.Services
                 throw new ArgumentException($"ورقة التصدير '{sheet.Name}' لا تحتوي على أعمدة.");
             }
 
-            var worksheet = workbook.Worksheets.Add(SanitizeSheetName(sheet.Name));
+            var worksheet = workbook.Worksheets.Add(GetUniqueSheetName(sheet.Name, usedSheetNames));
             worksheet.RightToLeft = true;
             worksheet.Style.Font.FontName = "Tahoma";
             worksheet.Style.Font.FontSize = 11;
@@ -100,6 +102,10 @@ namespace CarPartManager.Services
             worksheet.PageSetup.Margins.Bottom = 0.5;
             worksheet.PageSetup.Footer.Center.AddText("صفحة &P من &N");
             worksheet.PageSetup.Footer.Right.AddText("&A");
+            if (definition.ConfidentialFooter)
+            {
+                worksheet.PageSetup.Footer.Left.AddText("سري - للاستخدام الداخلي");
+            }
             worksheet.PageSetup.SetRowsToRepeatAtTop(HeaderRow, HeaderRow);
 
             for (var row = 1; row <= 4; row++)
@@ -144,7 +150,7 @@ namespace CarPartManager.Services
             dataRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
             dataRange.Style.Border.BottomBorder = XLBorderStyleValues.Hair;
             dataRange.Style.Border.BottomBorderColor = XLColor.FromHtml("#E2E8F0");
-            worksheet.Rows(FirstDataRow, lastDataRow).Height = 30;
+            worksheet.Rows(FirstDataRow, lastDataRow).Height = sheet.DataRowHeight;
 
             for (var columnIndex = 0; columnIndex < sheet.Columns.Count; columnIndex++)
             {
@@ -168,7 +174,15 @@ namespace CarPartManager.Services
                 {
                     var column = sheet.Columns[columnIndex];
                     var cell = worksheet.Cell(excelRow, columnIndex + 1);
-                    SetCellValue(cell, column.Value(row), column.Type);
+                    var formula = column.Formula?.Invoke(row, excelRow);
+                    if (formula is null)
+                    {
+                        SetCellValue(cell, column.Value(row), column.Type);
+                    }
+                    else
+                    {
+                        cell.FormulaA1 = formula;
+                    }
                 }
             }
 
@@ -182,6 +196,7 @@ namespace CarPartManager.Services
 
             ApplyHighlights(worksheet, sheet, lastDataRow);
             SetColumnWidths(worksheet, sheet);
+            WriteSummaryRows(worksheet, sheet, lastDataRow);
         }
 
         private static void SetCellValue(IXLCell cell, object? value, ExcelExportValueType type)
@@ -229,11 +244,12 @@ namespace CarPartManager.Services
                 var countIndex = FindColumnIndex(sheet, countColumn.Key);
                 var countLetter = XLHelper.GetColumnLetterFromNumber(countIndex + 1);
                 worksheet.Cell(totalsRow, countIndex + 1).FormulaA1 =
-                    $"SUBTOTAL(103,{countLetter}{FirstDataRow}:{countLetter}{lastDataRow})";
+                    $"=\"الإجمالي — عدد الصفوف: \"&SUBTOTAL(103,{countLetter}{FirstDataRow}:{countLetter}{lastDataRow})";
             }
             else
             {
-                worksheet.Cell(totalsRow, 1).SetValue("الإجمالي");
+                worksheet.Cell(totalsRow, 1).FormulaA1 =
+                    $"=\"الإجمالي — عدد الصفوف: \"&SUBTOTAL(103,A{FirstDataRow}:A{lastDataRow})";
             }
 
             foreach (var total in sheet.Totals)
@@ -245,9 +261,11 @@ namespace CarPartManager.Services
                 }
 
                 var letter = XLHelper.GetColumnLetterFromNumber(columnIndex + 1);
-                var formula = total.Value == ExcelExportTotalType.Count
-                    ? $"SUBTOTAL(103,{letter}{FirstDataRow}:{letter}{lastDataRow})"
-                    : $"SUBTOTAL(109,{letter}{FirstDataRow}:{letter}{lastDataRow})";
+                var formula = sheet.TotalFormulas.TryGetValue(total.Key, out var customFormula)
+                    ? customFormula(FirstDataRow, lastDataRow, totalsRow)
+                    : total.Value == ExcelExportTotalType.Count
+                        ? $"SUBTOTAL(103,{letter}{FirstDataRow}:{letter}{lastDataRow})"
+                        : $"SUBTOTAL(109,{letter}{FirstDataRow}:{letter}{lastDataRow})";
                 worksheet.Cell(totalsRow, columnIndex + 1).FormulaA1 = formula;
                 worksheet.Cell(totalsRow, columnIndex + 1).Style.NumberFormat.Format =
                     total.Value == ExcelExportTotalType.Count ? "#,##0" : "#,##0.00";
@@ -270,11 +288,75 @@ namespace CarPartManager.Services
                 }
 
                 var range = worksheet.Range(FirstDataRow, 1, lastDataRow, sheet.Columns.Count);
-                var formula = $"${XLHelper.GetColumnLetterFromNumber(columnIndex + 1)}{FirstDataRow}=\"{highlight.MatchValue.Replace("\"", "\"\"")}\"";
+                var columnLetter = XLHelper.GetColumnLetterFromNumber(columnIndex + 1);
+                var formula = highlight.GreaterThanZero
+                    ? $"${columnLetter}{FirstDataRow}>0"
+                    : $"${columnLetter}{FirstDataRow}=\"{highlight.MatchValue.Replace("\"", "\"\"")}\"";
                 var conditional = range.AddConditionalFormat().WhenIsTrue(formula);
                 conditional.Fill.BackgroundColor = XLColor.FromHtml("#" + highlight.FillColor.TrimStart('#'));
                 conditional.Font.FontColor = XLColor.FromHtml("#" + highlight.FontColor.TrimStart('#'));
                 conditional.Font.Strikethrough = highlight.Strikeout;
+            }
+        }
+
+        private static void WriteSummaryRows(IXLWorksheet worksheet, ExcelExportSheet sheet, int lastDataRow)
+        {
+            var rowNumber = Math.Max(FirstDataRow, lastDataRow + 1);
+            if (sheet.Rows.Count > 0 && sheet.Totals.Count > 0)
+            {
+                rowNumber++;
+            }
+
+            foreach (var summary in sheet.SummaryRows)
+            {
+                var firstTextColumn = -1;
+                for (var index = 0; index < sheet.Columns.Count; index++)
+                {
+                    if (sheet.Columns[index].Type == ExcelExportValueType.Text)
+                    {
+                        firstTextColumn = index;
+                        break;
+                    }
+                }
+
+                if (firstTextColumn >= 0)
+                {
+                    SetCellValue(worksheet.Cell(rowNumber, firstTextColumn + 1), summary.Label, ExcelExportValueType.Text);
+                }
+
+                for (var index = 0; index < sheet.Columns.Count; index++)
+                {
+                    var column = sheet.Columns[index];
+                    var cell = worksheet.Cell(rowNumber, index + 1);
+                    cell.Style.NumberFormat.Format = GetNumberFormat(column.Type);
+                    cell.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+                    cell.Style.Alignment.WrapText = column.WrapText;
+                    if (summary.Formulas.TryGetValue(column.Key, out var formula))
+                    {
+                        cell.FormulaA1 = formula
+                            .Replace("{firstDataRow}", FirstDataRow.ToString(System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal)
+                            .Replace("{lastDataRow}", lastDataRow.ToString(System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal)
+                            .Replace("{summaryRow}", rowNumber.ToString(System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal);
+                    }
+                    else if (summary.Values.TryGetValue(column.Key, out var value))
+                    {
+                        SetCellValue(cell, value, column.Type);
+                    }
+                }
+
+                var range = worksheet.Range(rowNumber, 1, rowNumber, sheet.Columns.Count);
+                range.Style.Font.Bold = summary.Bold;
+                range.Style.Border.TopBorder = XLBorderStyleValues.Hair;
+                range.Style.Border.TopBorderColor = XLColor.FromHtml("#CBD5E1");
+                if (!string.IsNullOrWhiteSpace(summary.FillColor))
+                {
+                    range.Style.Fill.BackgroundColor = XLColor.FromHtml(summary.FillColor);
+                }
+                if (!string.IsNullOrWhiteSpace(summary.FontColor))
+                {
+                    range.Style.Font.FontColor = XLColor.FromHtml(summary.FontColor);
+                }
+                rowNumber++;
             }
         }
 
@@ -324,7 +406,27 @@ namespace CarPartManager.Services
         {
             var invalid = new[] { '[', ']', ':', '*', '?', '/', '\\' };
             var safeName = new string(name.Select(ch => invalid.Contains(ch) ? '_' : ch).ToArray());
-            return safeName.Length > 31 ? safeName[..31] : safeName;
+            safeName = safeName.Length > 31 ? safeName[..31] : safeName;
+            return string.IsNullOrWhiteSpace(safeName) ? "تقرير" : safeName;
+        }
+
+        private static string GetUniqueSheetName(string name, ISet<string> usedNames)
+        {
+            var baseName = SanitizeSheetName(name);
+            if (usedNames.Add(baseName))
+            {
+                return baseName;
+            }
+
+            for (var suffix = 2; ; suffix++)
+            {
+                var marker = $" ({suffix})";
+                var candidate = baseName[..Math.Min(baseName.Length, 31 - marker.Length)] + marker;
+                if (usedNames.Add(candidate))
+                {
+                    return candidate;
+                }
+            }
         }
     }
 }

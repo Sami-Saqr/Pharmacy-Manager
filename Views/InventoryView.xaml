@@ -616,18 +616,34 @@
                                                FontWeight="Bold"
                                                Foreground="{StaticResource TextPrimaryBrush}" />
 
-                                    <Button Grid.Column="1"
-                                            Style="{StaticResource OutlineButtonStyle}"
-                                            Command="{Binding LoadSessionsCommand}"
-                                            Height="28" Padding="8,0">
-                                        <TextBlock Text="تحديث" FontSize="11" />
-                                    </Button>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <Button Style="{StaticResource OutlineButtonStyle}"
+                                                Click="ExportStocktakeSession_Click"
+                                                IsEnabled="{Binding CanExportStocktakeSession}"
+                                                ToolTip="{Binding StocktakeExportToolTip}"
+                                                Height="28" Padding="8,0" Margin="0,0,8,0">
+                                            <TextBlock Text="{Binding ExportButtonText}" FontSize="11" />
+                                        </Button>
+                                        <Button Style="{StaticResource OutlineButtonStyle}"
+                                                Click="ExportBlankStocktake_Click"
+                                                IsEnabled="{Binding CanExportBlankStocktake}"
+                                                ToolTip="{Binding StocktakeExportToolTip}"
+                                                Height="28" Padding="8,0" Margin="0,0,8,0">
+                                            <TextBlock Text="طباعة ورقة جرد" FontSize="11" />
+                                        </Button>
+                                        <Button Style="{StaticResource OutlineButtonStyle}"
+                                                Command="{Binding LoadSessionsCommand}"
+                                                Height="28" Padding="8,0">
+                                            <TextBlock Text="تحديث" FontSize="11" />
+                                        </Button>
+                                    </StackPanel>
                                 </Grid>
                             </Border>
 
                             <DataGrid Grid.Row="1"
                                       Style="{StaticResource CleanDataGridStyle}"
                                       ItemsSource="{Binding StocktakeHistory}"
+                                      SelectedItem="{Binding SelectedStocktakeSession, Mode=TwoWay}"
                                       RowHeight="40"
                                       SelectionMode="Single"
                                       HorizontalScrollBarVisibility="Auto"

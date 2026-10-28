@@ -12,7 +12,7 @@ namespace CarPartManager.ViewModels
     /// كل الاستعلامات تُفلتر في قاعدة البيانات (AsNoTracking) والمصروفات الملغاة مستبعدة من جميع الإجماليات.
     /// المصروفات وحدة مستقلة تماماً لا تؤثر على المخزون أو العملاء أو فواتير البيع.
     /// </summary>
-    public class ExpensesViewModel : ViewModelBase
+    public class ExpensesViewModel : ExcelExportViewModelBase
     {
         private readonly IExpenseService _expenseService;
         private readonly string? _currentUser;
@@ -23,7 +23,11 @@ namespace CarPartManager.ViewModels
         /// <summary>يمنع إعادة التحميل أثناء إعادة بناء قوائم الفلاتر.</summary>
         private bool _suppressFilterReload;
 
-        public ExpensesViewModel(IExpenseService? expenseService = null, string? currentUser = null)
+        public ExpensesViewModel(
+            IExpenseService? expenseService = null,
+            string? currentUser = null,
+            IExcelExportService? excelExportService = null)
+            : base(excelExportService)
         {
             _expenseService = expenseService ?? new SqliteExpenseService();
             _currentUser = currentUser;
@@ -67,6 +71,14 @@ namespace CarPartManager.ViewModels
         public ObservableCollection<ExpenseHistoryModel> ExpenseHistory { get; } = new();
         public ObservableCollection<ExpenseCategoryModel> Categories { get; } = new();
         public ObservableCollection<ExpenseCategoryModel> CategoryFilters { get; } = new();
+        public bool CanExportExpenses => !IsExporting && Expenses.Count > 0;
+        public override bool CanExport => !IsExporting && Expenses.Count > 0;
+
+        protected override void OnExportStateChanged()
+        {
+            base.OnExportStateChanged();
+            OnPropertyChanged(nameof(CanExportExpenses));
+        }
 
         public List<string> PaymentMethodFilters { get; } = new() { "الكل", "نقدي", "شبكة / فيزا", "تحويل بنكي", "شيك" };
 
@@ -333,6 +345,7 @@ namespace CarPartManager.ViewModels
 
                 Expenses.Clear();
                 foreach (var expense in data) Expenses.Add(expense);
+                OnPropertyChanged(nameof(CanExportExpenses));
 
                 // إجمالي النتائج المفلترة — للمصروفات النشطة فقط (الملغاة لا تدخل في أي إجمالي)
                 var activeTotal = Expenses.Where(e => !e.IsCancelled).Sum(e => e.Amount);
@@ -347,13 +360,38 @@ namespace CarPartManager.ViewModels
             {
                 if (token != _loadToken) return;
                 Expenses.Clear();
+                OnPropertyChanged(nameof(CanExportExpenses));
                 OnPropertyChanged(nameof(ShowEmptyState));
                 SetStatus($"تعذر تحميل قائمة المصروفات: {ex.Message}", error: true);
             }
+
             finally
             {
                 if (showLoading && token == _loadToken) IsLoading = false;
             }
+        }
+
+        public Task<bool> ExportExpensesAsync(string destinationPath, string shopName)
+        {
+            var from = FromDate;
+            var to = ToDate;
+            var categoryId = SelectedCategoryFilter?.Id ?? 0;
+            var categoryName = SelectedCategoryFilter?.Name ?? "الكل";
+            var paymentMethod = SelectedPaymentMethod == "الكل" ? null : SelectedPaymentMethod;
+            var includeCancelled = IncludeCancelled;
+            var searchText = SearchText;
+            var filters = $"الفترة: {from?.ToString("dd/MM/yyyy") ?? "البداية"} إلى {to?.ToString("dd/MM/yyyy") ?? "اليوم"} | التصنيف: {categoryName} | طريقة الدفع: {paymentMethod ?? "الكل"} | البحث: {(string.IsNullOrWhiteSpace(searchText) ? "الكل" : searchText.Trim())} | يشمل الملغي: {(includeCancelled ? "نعم" : "لا")}";
+            return ExportWorkbookAsync(async () =>
+            {
+                var expenses = (await _expenseService.GetExpensesAsync(
+                    from,
+                    to,
+                    categoryId,
+                    paymentMethod,
+                    includeCancelled,
+                    searchText)).ToList();
+                return PartBExcelExportMappers.Expenses(shopName, filters, expenses);
+            }, destinationPath);
         }
 
         private async Task LoadHistoryAsync()

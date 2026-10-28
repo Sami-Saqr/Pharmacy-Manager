@@ -1,16 +1,28 @@
 ﻿# CarPartManager - Handover Document
 
+## Latest: Excel export Part B — branch `feature-excel-export`
+
+**Status:** Reused the Part A ClosedXML service for customer list and customer-statement workbooks, filtered expenses with active-only totals and category percentages, all accounting-report datasets, and stocktake session/blank counting sheets. Stocktake export supports any selected history session; blank sheets hide book quantities by default and ask before showing them. No package or database changes were made.
+
+**Implementation:** Screen ViewModels query their existing services with the current filters/period and use the shared asynchronous export/save flow. Workbook mapping is centralized in `Services/PartBExcelExportMappers.cs`; the shared writer handles safe text, sheet-name sanitation, formulas, summaries, highlights, confidential report footers, and print setup. To add another export, add a mapper using `ExcelExportSheet`/`ExcelExportColumn`, fetch filtered source data from the existing service, then call `ExportWorkbookAsync` from the ViewModel and `ExcelExportDialog` from the view.
+
+**Files:** Updated shared export definitions/writer, Customers/Expenses/Reports/Inventory ViewModels and views, and added `CarPartManager.Tests/PartBExcelExportMapperTests.cs`. ClosedXML **0.105.1** remains the only added package.
+
+**Validation:** `dotnet build CarPartManager.csproj --no-restore` succeeded with 0 errors and 8 existing CS8602 warnings in `ViewModels/InventoryViewModel.cs`. The full existing test project passed **23/23** tests, including workbook checks for customer text safety, statement balances/summary, active-only expense formulas and category shares, report formulas/warnings, sheet names, stocktake formulas, blank counted cells, and book-quantity visibility. The app was not run and no database files were accessed.
+
+**Remaining/manual checks:** Open customer list/statements, expenses, every reports workbook tab, and stocktake session/blank-sheet exports in Excel; verify Arabic RTL rendering, filtering/formula results, and A4 print previews. Customer-list last-payment date remains omitted because the list model/service does not expose it; the field is optional. Products export remains a separate follow-up because it uses a distinct list/mapping.
+
 ## Latest: Excel export Part A — branch `feature-excel-export`
 
 **Status:** Added reusable `.xlsx` export infrastructure and export buttons for Inventory stock overview, Inventory movements, Sales invoice history, and Purchase invoice history. The three history/inventory exports use their current search, stock/status, movement date/product/type filters and include unpaged database results. Products has a separate list/mapping, so its export button is deferred rather than duplicating the inventory mapper.
 
-**Implementation:** Added ClosedXML **0.105.1** (the only new package). `IExcelExportService` and `ExcelExportService` create RTL, styled workbooks with filters, frozen headers, typed cells, subtotals, highlights, print setup, safe text handling, and temp-file replacement. Screen mappers live in `Services/ExcelExportMappers.cs`; invoice history export queries are in the SQLite invoice services; view models expose exporting/empty-data state; shared SaveFileDialog and success/open handling is in `Views/ExcelExportDialog.cs`. To add a screen in Part B, add a mapper/sheet definition, a filtered `AsNoTracking` query if needed, then invoke the shared export service from the screen ViewModel and dialog.
+**Implementation:** Added ClosedXML **0.105.1** (the only new package). `IExcelExportService` and `ExcelExportService` create RTL, styled workbooks with filters, frozen headers, typed cells, subtotals, highlights, print setup, safe text handling, and temp-file replacement. Screen mappers live in `Services/ExcelExportMappers.cs`; invoice history export queries are in the SQLite invoice services; view models expose exporting/empty-data state; shared SaveFileDialog and success/open handling is in `Views/ExcelExportDialog.cs`. Part B extends this shared flow through `Services/PartBExcelExportMappers.cs`.
 
 **Files:** Added `Services/ExcelExportDefinition.cs`, `ExcelExportMappers.cs`, `ExcelExportService.cs`, `IExcelExportService.cs`, `InvoiceExportRecord.cs`, `ViewModels/ExcelExportViewModelBase.cs`, `Views/ExcelExportDialog.cs`, and `CarPartManager.Tests/ExcelExportServiceTests.cs`. Updated `CarPartManager.csproj`, inventory/invoice service contracts and implementations, the three export ViewModels, and the Inventory/Sales/Purchase history views and code-behind.
 
 **Validation:** ClosedXML restore succeeded. `dotnet build CarPartManager.csproj --no-restore` succeeded with 0 errors and 8 existing CS8602 warnings in `ViewModels/InventoryViewModel.cs`. The targeted Excel export tests passed (2/2): workbook RTL, headers, typed codes/numbers/dates, injection strings, subtotal formulas, and locked-target preservation. The app was not run and no database files were accessed.
 
-**Remaining/manual checks:** Open stock, movement, sales-history, and purchase-history exports in Excel; check Arabic/RTL layout, currency/date readability, print titles/page footer and filter-aware totals. Compare invoice and stock totals with their screens under searches/filters. Part B exports for Products, Customers, Expenses, and Reports remain out of scope.
+**Remaining/manual checks:** Open stock, movement, sales-history, and purchase-history exports in Excel; check Arabic/RTL layout, currency/date readability, print titles/page footer and filter-aware totals. Compare invoice and stock totals with their screens under searches/filters. Part B manual checks are listed in the latest section above.
 
 ## Latest: Home tile navigation — branch `feature-home-tiles`
 

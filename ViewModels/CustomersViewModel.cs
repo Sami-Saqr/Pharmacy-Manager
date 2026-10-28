@@ -12,7 +12,7 @@ namespace CarPartManager.ViewModels
     /// يدعم: قائمة العملاء مع البحث، الإضافة/التعديل عبر لوحة جانبية،
     /// التعطيل/التفعيل، كشف الحساب، وتسجيل الدفعات.
     /// </summary>
-    public class CustomersViewModel : ViewModelBase
+    public class CustomersViewModel : ExcelExportViewModelBase
     {
         // ── الأوضاع الداخلية للشاشة ───────────────────────────────────────────
         public enum ScreenMode { List, Statement, Payment }
@@ -156,7 +156,11 @@ namespace CarPartManager.ViewModels
         public CustomerModel? StatementCustomer
         {
             get => _statementCustomer;
-            set => SetProperty(ref _statementCustomer, value);
+            set
+            {
+                if (SetProperty(ref _statementCustomer, value))
+                    OnPropertyChanged(nameof(CanExportStatement));
+            }
         }
 
         public ObservableCollection<CustomerStatementLineModel> StatementLines { get; } = new();
@@ -265,6 +269,9 @@ namespace CarPartManager.ViewModels
                     OnPropertyChanged(nameof(IsListMode));
                     OnPropertyChanged(nameof(IsStatementMode));
                     OnPropertyChanged(nameof(IsPaymentMode));
+                    OnPropertyChanged(nameof(CanExportCustomers));
+                    OnPropertyChanged(nameof(CanExportStatement));
+                    OnPropertyChanged(nameof(CanExport));
                 }
             }
         }
@@ -272,6 +279,17 @@ namespace CarPartManager.ViewModels
         public bool IsListMode => CurrentMode == ScreenMode.List;
         public bool IsStatementMode => CurrentMode == ScreenMode.Statement;
         public bool IsPaymentMode => CurrentMode == ScreenMode.Payment;
+        public bool CanExportCustomers => !IsExporting && IsListMode && FilteredCustomers.Count > 0;
+        public bool CanExportStatement => !IsExporting && IsStatementMode && StatementCustomer != null;
+        public override bool CanExport =>
+            !IsExporting && (IsListMode ? FilteredCustomers.Count > 0 : IsStatementMode && StatementCustomer != null);
+
+        protected override void OnExportStateChanged()
+        {
+            base.OnExportStateChanged();
+            OnPropertyChanged(nameof(CanExportCustomers));
+            OnPropertyChanged(nameof(CanExportStatement));
+        }
 
         // ══════════════════════════════════════════════════════════════════════
         // الأوامر
@@ -294,7 +312,10 @@ namespace CarPartManager.ViewModels
         // البناء
         // ══════════════════════════════════════════════════════════════════════
 
-        public CustomersViewModel(ICustomerService? customerService = null)
+        public CustomersViewModel(
+            ICustomerService? customerService = null,
+            IExcelExportService? excelExportService = null)
+            : base(excelExportService)
         {
             _customerService = customerService ?? new SqliteCustomerService();
 
@@ -392,6 +413,76 @@ namespace CarPartManager.ViewModels
 
             foreach (var c in filtered) FilteredCustomers.Add(c);
             OnPropertyChanged(nameof(ShowEmpty));
+            OnPropertyChanged(nameof(CanExportCustomers));
+            OnPropertyChanged(nameof(CanExport));
+        }
+
+        public Task<bool> ExportCustomersAsync(string destinationPath, string shopName)
+        {
+            var searchText = SearchText.Trim();
+            var searchQuery = searchText.ToLower();
+            var filterMode = FilterMode;
+            var filters = GetCustomerFilters(searchText, filterMode);
+            return ExportWorkbookAsync(async () =>
+            {
+                var customers = (await _customerService.GetAllCustomersAsync()).ToList();
+                IEnumerable<CustomerModel> filtered = customers;
+                if (!string.IsNullOrWhiteSpace(searchText))
+                {
+                    filtered = filtered.Where(customer =>
+                        customer.Name.ToLower().Contains(searchQuery) ||
+                        (customer.Phone?.ToLower().Contains(searchQuery) ?? false));
+                }
+
+                filtered = filterMode switch
+                {
+                    "active" => filtered.Where(customer => customer.IsActive),
+                    "has_balance" => filtered.Where(customer => customer.CurrentBalance > 0m),
+                    _ => filtered
+                };
+                return PartBExcelExportMappers.Customers(shopName, filters, filtered);
+            }, destinationPath);
+        }
+
+        public Task<bool> ExportStatementAsync(string destinationPath, string shopName)
+        {
+            var customer = StatementCustomer;
+            var from = StatementFrom;
+            var to = StatementTo;
+            return ExportWorkbookAsync(async () =>
+            {
+                var selectedCustomer = customer
+                    ?? throw new InvalidOperationException("يجب تحديد عميل لتصدير كشف الحساب.");
+                var lines = (await _customerService.GetStatementAsync(selectedCustomer.Id, from, to)).ToList();
+                var totalSales = lines
+                    .Where(line => line.EntryType != "دفعة استلام" && line.EntryType != "دفعة ملغاة")
+                    .Sum(line => line.InvoiceTotal ?? line.DebitAmount);
+                var totalPaid = lines
+                    .Where(line => !line.IsCancelledPayment)
+                    .Sum(line => (line.InvoicePaid ?? 0m) + line.CreditAmount);
+                var currentBalance = await _customerService.CalculateBalanceAsync(selectedCustomer.Id);
+                return PartBExcelExportMappers.CustomerStatement(
+                    shopName,
+                    selectedCustomer,
+                    from,
+                    to,
+                    lines,
+                    totalSales,
+                    totalPaid,
+                    currentBalance);
+            }, destinationPath);
+        }
+
+        private static string GetCustomerFilters(string searchText, string filterMode)
+        {
+            var search = string.IsNullOrWhiteSpace(searchText) ? "الكل" : searchText;
+            var status = filterMode switch
+            {
+                "active" => "النشطون",
+                "has_balance" => "لديهم رصيد",
+                _ => "الكل"
+            };
+            return $"البحث: {search} | الحالة: {status}";
         }
 
         // ══════════════════════════════════════════════════════════════════════
