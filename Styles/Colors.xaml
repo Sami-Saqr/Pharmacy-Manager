@@ -13,22 +13,6 @@
     <Color x:Key="CardBackground">#FFFFFF</Color>
     <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackground}" />
 
-    <!-- الشريط الجانبي (Sidebar) -->
-    <Color x:Key="SidebarBackground">#0F172A</Color>
-    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource SidebarBackground}" />
-
-    <Color x:Key="SidebarItemHover">#1E293B</Color>
-    <SolidColorBrush x:Key="SidebarItemHoverBrush" Color="{StaticResource SidebarItemHover}" />
-
-    <Color x:Key="SidebarItemSelected">#2563EB</Color>
-    <SolidColorBrush x:Key="SidebarItemSelectedBrush" Color="{StaticResource SidebarItemSelected}" />
-
-    <Color x:Key="SidebarText">#94A3B8</Color>
-    <SolidColorBrush x:Key="SidebarTextBrush" Color="{StaticResource SidebarText}" />
-
-    <Color x:Key="SidebarTextActive">#FFFFFF</Color>
-    <SolidColorBrush x:Key="SidebarTextActiveBrush" Color="{StaticResource SidebarTextActive}" />
-
     <!-- ألوان التمييز (Accents) -->
     <Color x:Key="PrimaryBlue">#2563EB</Color>
     <SolidColorBrush x:Key="PrimaryBlueBrush" Color="{StaticResource PrimaryBlue}" />

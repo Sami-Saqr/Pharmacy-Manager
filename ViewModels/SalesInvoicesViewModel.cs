@@ -11,7 +11,7 @@ namespace CarPartManager.ViewModels
     /// <summary>
     /// نموذج عرض شاشة فواتير المبيعات ونقاط البيع وإدارة حركات الصرف والخصم من المخزون
     /// </summary>
-    public class SalesInvoicesViewModel : ViewModelBase
+    public class SalesInvoicesViewModel : ViewModelBase, IHasUnsavedChanges
     {
         private readonly ISalesInvoiceService _invoiceService;
         private readonly IProductService _productService;
@@ -28,6 +28,8 @@ namespace CarPartManager.ViewModels
         public ObservableCollection<ProductModel> BarcodeSuggestions { get; } = new();
         public ObservableCollection<CustomerModel> CustomerSuggestions { get; } = new();
         public ObservableCollection<string> PaymentMethodsList { get; } = new() { "نقدي", "شبكة / فيزا", "آجل" };
+        public bool HasUnsavedChanges =>
+            CurrentInvoiceItems.Count > 0 && !IsPosted && !IsCancelled;
 
         public static bool IsHeadlessTestMode { get; set; }
 

@@ -86,6 +86,7 @@ namespace CarPartManager.ViewModels
         private readonly HashSet<ViewModelBase> _pendingRefreshes = new();
         private readonly Dictionary<string, PlaceholderViewModel> _placeholderCache = new();
         private int _navigationRequest;
+        private bool _isNavigationRequestInProgress;
 
         private bool _isNavigationLoading;
         public bool IsNavigationLoading
@@ -133,7 +134,7 @@ namespace CarPartManager.ViewModels
             {
                 if (param is NavItem navItem)
                 {
-                    NavigateTo(navItem);
+                    RequestNavigation(navItem);
                 }
                 else if (param is string tag)
                 {
@@ -141,7 +142,7 @@ namespace CarPartManager.ViewModels
                     var found = NavigationItems.FirstOrDefault(x => x.Tag == tag);
                     if (found != null)
                     {
-                        NavigateTo(found);
+                        RequestNavigation(found);
                     }
                 }
             });
@@ -149,16 +150,28 @@ namespace CarPartManager.ViewModels
             GoHomeCommand = new RelayCommand(GoHome);
         }
 
+        private void RequestNavigation(NavItem item)
+        {
+            if (_isNavigationRequestInProgress || IsNavigationLoading)
+            {
+                return;
+            }
+
+            _isNavigationRequestInProgress = true;
+            try
+            {
+                NavigateTo(item);
+            }
+            finally
+            {
+                _isNavigationRequestInProgress = false;
+            }
+        }
+
         private void NavigateTo(NavItem selectedItem)
         {
             CurrentScreenTitle = selectedItem.Title;
             var previousViewModel = CurrentViewModel;
-
-            // تحديث حالة الاختيار لجميع العناصر
-            foreach (var item in NavigationItems)
-            {
-                item.IsSelected = (item == selectedItem);
-            }
 
             if (selectedItem.Tag == "Dashboard")
             {
@@ -276,15 +289,37 @@ namespace CarPartManager.ViewModels
 
         private void GoHome()
         {
-            foreach (var item in NavigationItems)
+            if (_isNavigationRequestInProgress)
             {
-                item.IsSelected = false;
+                return;
             }
 
-            CurrentScreenTitle = "الرئيسية";
-            CurrentViewModel = _homeViewModel;
-            _navigationRequest++;
-            IsNavigationLoading = false;
+            _isNavigationRequestInProgress = true;
+            try
+            {
+                if (CurrentViewModel is IHasUnsavedChanges { HasUnsavedChanges: true })
+                {
+                    var dialog = new UnsavedChangesDialog();
+                    if (Application.Current?.MainWindow is { } owner)
+                    {
+                        dialog.Owner = owner;
+                    }
+
+                    if (dialog.ShowDialog() != false)
+                    {
+                        return;
+                    }
+                }
+
+                CurrentScreenTitle = "الرئيسية";
+                CurrentViewModel = _homeViewModel;
+                _navigationRequest++;
+                IsNavigationLoading = false;
+            }
+            finally
+            {
+                _isNavigationRequestInProgress = false;
+            }
         }
 
         private void QueueLoad(
@@ -306,7 +341,7 @@ namespace CarPartManager.ViewModels
                 return;
             }
 
-            IsNavigationLoading = false;
+            IsNavigationLoading = true;
             Application.Current.Dispatcher.BeginInvoke(
                 DispatcherPriority.Background,
                 new Action(() =>

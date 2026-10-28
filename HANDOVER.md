@@ -1,5 +1,15 @@
 ﻿# CarPartManager - Handover Document
 
+## Latest: Home tile navigation — branch `feature-home-tiles`
+
+**Status:** Replaced the right-side navigation sidebar with a Home screen of adaptive, grouped Arabic navigation tiles and a shared full-width inner-screen header. The Home screen is the startup destination; its footer carries the existing store name and version. POS is visually emphasized. The header provides the current screen title, a “← الرئيسية” button, existing user/date/branch/database details, and Alt+Home navigation.
+
+**Unsaved POS work:** `SalesInvoicesViewModel` exposes the `IHasUnsavedChanges` contract when a nonempty invoice is neither posted nor cancelled. Returning Home by button or Alt+Home prompts in Arabic; choosing “الرجوع للشاشة” stays on POS, while “الخروج وتجاهل التغييرات” returns Home. Home tile navigation is not guarded. Navigation ignores repeated tile requests during screen loading and preserves deferred async loads.
+
+**Files:** Added `Models/HomeTile.cs`, `ViewModels/HomeViewModel.cs`, `Views/HomeView.xaml` and code-behind, `MVVM/IHasUnsavedChanges.cs`, and the unsaved-changes dialog view/code-behind. Updated `App.xaml`, `MainWindow.xaml`, `ViewModels/MainViewModel.cs`, `ViewModels/SalesInvoicesViewModel.cs`, `Models/NavItem.cs`, and the Home/control color styles. Removed verified sidebar-only styles/colors and the unused navigation selection state. The earlier `a62d36e` commit contains the Home tile data/view setup; the shell, guard, and cleanup are included in the current changes.
+
+**Validation and remaining work:** `dotnet build CarPartManager.csproj --no-restore` succeeded with 0 errors and 8 existing CS8602 warnings in `ViewModels/InventoryViewModel.cs`. The app was not run and visual/keyboard/unsaved-dialog behavior remains for manual verification at 1340×820 and 1040×680. Verify Home reflow/scroll, all 12 destinations, full-width inner screens, Alt+Home, button navigation, and both POS prompt choices with an unsaved invoice. No database or schema files were changed. Static inspection indicates Reports synchronously reads completed task results and Returns synchronously dispatches collection updates; these screen-load paths were not refactored. Other responsive loading remains as before.
+
 ## Latest: Navigation and cashier responsiveness implementation — branch `fix-performance`
 **Date:** 2026-10-28
 
