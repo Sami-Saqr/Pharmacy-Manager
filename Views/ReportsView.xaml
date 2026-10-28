@@ -399,20 +399,20 @@
                                           AutoGenerateColumns="False" IsReadOnly="True"
                                           CanUserAddRows="False" CanUserDeleteRows="False"
                                           SelectionMode="Single" RowHeight="40"
-                                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                           ScrollViewer.VerticalScrollBarVisibility="Auto">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="التاريخ" Binding="{Binding DayText}" Width="140"
+                                        <DataGridTextColumn Header="التاريخ" Binding="{Binding DayText}" Width="140" MinWidth="120"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="عدد الفواتير" Binding="{Binding InvoiceCount}" Width="110"
+                                        <DataGridTextColumn Header="عدد الفواتير" Binding="{Binding InvoiceCount}" Width="110" MinWidth="90"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="الإجمالي" Binding="{Binding Total, StringFormat={}{0:N2}}" Width="*"
+                                        <DataGridTextColumn Header="الإجمالي" Binding="{Binding Total, StringFormat={}{0:N2}}" Width="110" MinWidth="90"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="الخصم" Binding="{Binding Discount, StringFormat={}{0:N2}}" Width="*"
+                                        <DataGridTextColumn Header="الخصم" Binding="{Binding Discount, StringFormat={}{0:N2}}" Width="110" MinWidth="90"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="المرتجعات" Binding="{Binding ReturnsTotal, StringFormat={}{0:N2}}" Width="*"
+                                        <DataGridTextColumn Header="المرتجعات" Binding="{Binding ReturnsTotal, StringFormat={}{0:N2}}" Width="110" MinWidth="90"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="الصافي" Binding="{Binding Net, StringFormat={}{0:N2}}" Width="*"
+                                        <DataGridTextColumn Header="الصافي" Binding="{Binding Net, StringFormat={}{0:N2}}" Width="*" MinWidth="90"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
                                     </DataGrid.Columns>
                                 </DataGrid>
@@ -457,11 +457,11 @@
                                               SelectionMode="Single" RowHeight="38"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*"
+                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*" MinWidth="140"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="الكمية" Binding="{Binding QuantitySold}" Width="80"
+                                            <DataGridTextColumn Header="الكمية" Binding="{Binding QuantitySold}" Width="80" MinWidth="60"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="القيمة" Binding="{Binding SalesValue, StringFormat={}{0:N2}}" Width="110"
+                                            <DataGridTextColumn Header="القيمة" Binding="{Binding SalesValue, StringFormat={}{0:N2}}" Width="110" MinWidth="90"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
@@ -483,11 +483,11 @@
                                               SelectionMode="Single" RowHeight="38"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*"
+                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*" MinWidth="140"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="الكمية" Binding="{Binding QuantitySold}" Width="80"
+                                            <DataGridTextColumn Header="الكمية" Binding="{Binding QuantitySold}" Width="80" MinWidth="60"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="القيمة" Binding="{Binding SalesValue, StringFormat={}{0:N2}}" Width="110"
+                                            <DataGridTextColumn Header="القيمة" Binding="{Binding SalesValue, StringFormat={}{0:N2}}" Width="110" MinWidth="90"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
@@ -509,13 +509,13 @@
                                               SelectionMode="Single" RowHeight="38"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="العميل" Binding="{Binding CustomerName}" Width="*"
+                                            <DataGridTextColumn Header="العميل" Binding="{Binding CustomerName}" Width="*" MinWidth="140"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="فواتير" Binding="{Binding InvoiceCount}" Width="70"
+                                            <DataGridTextColumn Header="فواتير" Binding="{Binding InvoiceCount}" Width="70" MinWidth="60"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="الصافي" Binding="{Binding NetSales, StringFormat={}{0:N2}}" Width="110"
+                                            <DataGridTextColumn Header="الصافي" Binding="{Binding NetSales, StringFormat={}{0:N2}}" Width="110" MinWidth="90"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="النسبة" Binding="{Binding SharePercent, StringFormat={}{0:N1}٪}" Width="80"
+                                            <DataGridTextColumn Header="النسبة" Binding="{Binding SharePercent, StringFormat={}{0:N1}٪}" Width="80" MinWidth="60"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
@@ -595,13 +595,13 @@
                                               SelectionMode="Single" RowHeight="42"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="التصنيف" Binding="{Binding CategoryName}" Width="*"
+                                            <DataGridTextColumn Header="التصنيف" Binding="{Binding CategoryName}" Width="*" MinWidth="120"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="الإجمالي" Binding="{Binding Total, StringFormat={}{0:N2}}" Width="130"
+                                            <DataGridTextColumn Header="الإجمالي" Binding="{Binding Total, StringFormat={}{0:N2}}" Width="130" MinWidth="110"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="العدد" Binding="{Binding Count}" Width="70"
+                                            <DataGridTextColumn Header="العدد" Binding="{Binding Count}" Width="70" MinWidth="60"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="النسبة" Binding="{Binding SharePercent, StringFormat={}{0:N1}٪}" Width="80"
+                                            <DataGridTextColumn Header="النسبة" Binding="{Binding SharePercent, StringFormat={}{0:N1}٪}" Width="80" MinWidth="60"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
@@ -623,19 +623,19 @@
                                               SelectionMode="Single" RowHeight="42"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="التاريخ" Binding="{Binding ExpenseDateText}" Width="120"
+                                            <DataGridTextColumn Header="التاريخ" Binding="{Binding ExpenseDateText}" Width="120" MinWidth="100"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="التصنيف" Binding="{Binding CategoryName}" Width="150"
+                                            <DataGridTextColumn Header="التصنيف" Binding="{Binding CategoryName}" Width="150" MinWidth="130"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="البيان" Binding="{Binding Description}" Width="*"
+                                            <DataGridTextColumn Header="البيان" Binding="{Binding Description}" Width="*" MinWidth="140"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="المبلغ" Binding="{Binding Amount, StringFormat={}{0:N2}}" Width="120"
+                                            <DataGridTextColumn Header="المبلغ" Binding="{Binding Amount, StringFormat={}{0:N2}}" Width="120" MinWidth="100"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="طريقة الدفع" Binding="{Binding PaymentMethod}" Width="120"
+                                            <DataGridTextColumn Header="طريقة الدفع" Binding="{Binding PaymentMethod}" Width="120" MinWidth="100"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="مرجعي" Binding="{Binding ReferenceNumber}" Width="110"
+                                            <DataGridTextColumn Header="مرجعي" Binding="{Binding ReferenceNumber}" Width="110" MinWidth="90"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="المستخدم" Binding="{Binding CreatedBy}" Width="130"
+                                            <DataGridTextColumn Header="المستخدم" Binding="{Binding CreatedBy}" Width="130" MinWidth="110"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
@@ -734,14 +734,14 @@
                                           AutoGenerateColumns="False" IsReadOnly="True"
                                           CanUserAddRows="False" CanUserDeleteRows="False"
                                           SelectionMode="Single" RowHeight="40"
-                                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                           ScrollViewer.VerticalScrollBarVisibility="Auto">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="التاريخ" Binding="{Binding DayText}" Width="150"
+                                        <DataGridTextColumn Header="التاريخ" Binding="{Binding DayText}" Width="150" MinWidth="130"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="عدد الفواتير" Binding="{Binding InvoiceCount}" Width="130"
+                                        <DataGridTextColumn Header="عدد الفواتير" Binding="{Binding InvoiceCount}" Width="130" MinWidth="100"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="الإجمالي" Binding="{Binding Total, StringFormat={}{0:N2}}" Width="*"
+                                        <DataGridTextColumn Header="الإجمالي" Binding="{Binding Total, StringFormat={}{0:N2}}" Width="*" MinWidth="110"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
                                     </DataGrid.Columns>
                                 </DataGrid>
@@ -784,13 +784,13 @@
                                               SelectionMode="Single" RowHeight="38"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="المورد" Binding="{Binding SupplierName}" Width="*"
+                                            <DataGridTextColumn Header="المورد" Binding="{Binding SupplierName}" Width="*" MinWidth="140"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="فواتير" Binding="{Binding InvoiceCount}" Width="80"
+                                            <DataGridTextColumn Header="فواتير" Binding="{Binding InvoiceCount}" Width="80" MinWidth="60"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="الإجمالي" Binding="{Binding Total, StringFormat={}{0:N2}}" Width="130"
+                                            <DataGridTextColumn Header="الإجمالي" Binding="{Binding Total, StringFormat={}{0:N2}}" Width="130" MinWidth="110"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="النسبة" Binding="{Binding SharePercent, StringFormat={}{0:N1}٪}" Width="90"
+                                            <DataGridTextColumn Header="النسبة" Binding="{Binding SharePercent, StringFormat={}{0:N1}٪}" Width="90" MinWidth="70"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
@@ -812,11 +812,11 @@
                                               SelectionMode="Single" RowHeight="38"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*"
+                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*" MinWidth="140"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="الكمية" Binding="{Binding QuantitySold}" Width="90"
+                                            <DataGridTextColumn Header="الكمية" Binding="{Binding QuantitySold}" Width="90" MinWidth="70"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="القيمة" Binding="{Binding SalesValue, StringFormat={}{0:N2}}" Width="130"
+                                            <DataGridTextColumn Header="القيمة" Binding="{Binding SalesValue, StringFormat={}{0:N2}}" Width="130" MinWidth="110"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
@@ -949,13 +949,13 @@
                                               SelectionMode="Single" RowHeight="38"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*"
+                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*" MinWidth="140"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="90"
+                                            <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="90" MinWidth="70"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="التكلفة" Binding="{Binding CostPrice, StringFormat={}{0:N2}}" Width="110"
+                                            <DataGridTextColumn Header="التكلفة" Binding="{Binding CostPrice, StringFormat={}{0:N2}}" Width="110" MinWidth="90"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="القيمة" Binding="{Binding StockValue, StringFormat={}{0:N2}}" Width="130"
+                                            <DataGridTextColumn Header="القيمة" Binding="{Binding StockValue, StringFormat={}{0:N2}}" Width="130" MinWidth="110"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
@@ -977,13 +977,13 @@
                                               SelectionMode="Single" RowHeight="38"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*"
+                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*" MinWidth="140"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="90"
+                                            <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="90" MinWidth="70"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="الحد الأدنى" Binding="{Binding MinimumStock}" Width="110"
+                                            <DataGridTextColumn Header="الحد الأدنى" Binding="{Binding MinimumStock}" Width="110" MinWidth="90"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="القيمة" Binding="{Binding StockValue, StringFormat={}{0:N2}}" Width="130"
+                                            <DataGridTextColumn Header="القيمة" Binding="{Binding StockValue, StringFormat={}{0:N2}}" Width="130" MinWidth="110"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
@@ -1014,11 +1014,11 @@
                                               SelectionMode="Single" RowHeight="38"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*"
+                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*" MinWidth="140"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="الباركود" Binding="{Binding Barcode}" Width="120"
+                                            <DataGridTextColumn Header="الباركود" Binding="{Binding Barcode}" Width="120" MinWidth="100"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="آخر بيع" Binding="{Binding LastSaleDateText}" Width="120"
+                                            <DataGridTextColumn Header="آخر بيع" Binding="{Binding LastSaleDateText}" Width="120" MinWidth="100"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
@@ -1044,13 +1044,13 @@
                                               SelectionMode="Single" RowHeight="38"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*"
+                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*" MinWidth="140"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="90"
+                                            <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="90" MinWidth="70"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="القيمة" Binding="{Binding StockValue, StringFormat={}{0:N2}}" Width="130"
+                                            <DataGridTextColumn Header="القيمة" Binding="{Binding StockValue, StringFormat={}{0:N2}}" Width="130" MinWidth="110"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="آخر بيع" Binding="{Binding LastSaleDateText}" Width="120"
+                                            <DataGridTextColumn Header="آخر بيع" Binding="{Binding LastSaleDateText}" Width="120" MinWidth="100"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
@@ -1119,18 +1119,18 @@
                                           AutoGenerateColumns="False" IsReadOnly="True"
                                           CanUserAddRows="False" CanUserDeleteRows="False"
                                           SelectionMode="Single" RowHeight="42"
-                                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                           ScrollViewer.VerticalScrollBarVisibility="Auto">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="العميل" Binding="{Binding CustomerName}" Width="*"
+                                        <DataGridTextColumn Header="العميل" Binding="{Binding CustomerName}" Width="*" MinWidth="140"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="الهاتف" Binding="{Binding Phone}" Width="140"
+                                        <DataGridTextColumn Header="الهاتف" Binding="{Binding Phone}" Width="140" MinWidth="120"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="الرصيد المستحق" Binding="{Binding Balance, StringFormat={}{0:N2}}" Width="150"
+                                        <DataGridTextColumn Header="الرصيد المستحق" Binding="{Binding Balance, StringFormat={}{0:N2}}" Width="150" MinWidth="130"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="آخر دفعة" Binding="{Binding LastPaymentDateText}" Width="150"
+                                        <DataGridTextColumn Header="آخر دفعة" Binding="{Binding LastPaymentDateText}" Width="150" MinWidth="130"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="أقدم فاتورة غير مسددة" Binding="{Binding OldestUnpaidInvoiceDateText}" Width="190"
+                                        <DataGridTextColumn Header="أقدم فاتورة غير مسددة" Binding="{Binding OldestUnpaidInvoiceDateText}" Width="190" MinWidth="170"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
                                     </DataGrid.Columns>
                                 </DataGrid>
@@ -1227,20 +1227,20 @@
                                           AutoGenerateColumns="False" IsReadOnly="True"
                                           CanUserAddRows="False" CanUserDeleteRows="False"
                                           SelectionMode="Single" RowHeight="40"
-                                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                           ScrollViewer.VerticalScrollBarVisibility="Auto">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*"
+                                        <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*" MinWidth="140"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="الكمية المبيعة" Binding="{Binding QuantitySold}" Width="130"
+                                        <DataGridTextColumn Header="الكمية المبيعة" Binding="{Binding QuantitySold}" Width="130" MinWidth="110"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="قيمة البيع" Binding="{Binding SalesValue, StringFormat={}{0:N2}}" Width="150"
+                                        <DataGridTextColumn Header="قيمة البيع" Binding="{Binding SalesValue, StringFormat={}{0:N2}}" Width="150" MinWidth="130"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="التكلفة" Binding="{Binding Cost, StringFormat={}{0:N2}}" Width="150"
+                                        <DataGridTextColumn Header="التكلفة" Binding="{Binding Cost, StringFormat={}{0:N2}}" Width="150" MinWidth="130"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="الربح" Binding="{Binding Profit, StringFormat={}{0:N2}}" Width="150"
+                                        <DataGridTextColumn Header="الربح" Binding="{Binding Profit, StringFormat={}{0:N2}}" Width="150" MinWidth="130"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                        <DataGridTextColumn Header="الهامش" Binding="{Binding MarginText}" Width="100"
+                                        <DataGridTextColumn Header="الهامش" Binding="{Binding MarginText}" Width="100" MinWidth="80"
                                                             ElementStyle="{StaticResource ReportCellTextStyle}" />
                                     </DataGrid.Columns>
                                 </DataGrid>
@@ -1275,11 +1275,11 @@
                                               SelectionMode="Single" RowHeight="38"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*"
+                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*" MinWidth="140"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="الربح" Binding="{Binding Profit, StringFormat={}{0:N2}}" Width="130"
+                                            <DataGridTextColumn Header="الربح" Binding="{Binding Profit, StringFormat={}{0:N2}}" Width="130" MinWidth="110"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="الهامش" Binding="{Binding MarginText}" Width="90"
+                                            <DataGridTextColumn Header="الهامش" Binding="{Binding MarginText}" Width="90" MinWidth="70"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
@@ -1301,11 +1301,11 @@
                                               SelectionMode="Single" RowHeight="38"
                                               ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*"
+                                            <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*" MinWidth="140"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="الربح" Binding="{Binding Profit, StringFormat={}{0:N2}}" Width="130"
+                                            <DataGridTextColumn Header="الربح" Binding="{Binding Profit, StringFormat={}{0:N2}}" Width="130" MinWidth="110"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
-                                            <DataGridTextColumn Header="الهامش" Binding="{Binding MarginText}" Width="90"
+                                            <DataGridTextColumn Header="الهامش" Binding="{Binding MarginText}" Width="90" MinWidth="70"
                                                                 ElementStyle="{StaticResource ReportCellTextStyle}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
