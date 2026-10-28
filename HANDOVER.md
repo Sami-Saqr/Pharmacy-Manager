@@ -2,6 +2,8 @@
 
 ## Latest: Home tile navigation — branch `feature-home-tiles`
 
+**Home tile visual update (2026-10-28):** Filled the three Home tile groups with high-contrast green, blue, and indigo palette brushes; added group-specific darker hover colors, near-white text/icons, and a visible keyboard focus ring. Increased tile titles/descriptions and section heading sizes, emphasized the POS title, and raised tile dimensions/minimums with two-line wrapped descriptions. Home visuals were not runtime-tested; verify tile reflow and text/focus rendering at 1340×820 and the minimum 1040×680.
+
 **Status:** Replaced the right-side navigation sidebar with a Home screen of adaptive, grouped Arabic navigation tiles and a shared full-width inner-screen header. The Home screen is the startup destination; its footer carries the existing store name and version. POS is visually emphasized. The header provides the current screen title, a “← الرئيسية” button, existing user/date/branch/database details, and Alt+Home navigation.
 
 **Unsaved POS work:** `SalesInvoicesViewModel` exposes the `IHasUnsavedChanges` contract when a nonempty invoice is neither posted nor cancelled. Returning Home by button or Alt+Home prompts in Arabic; choosing “الرجوع للشاشة” stays on POS, while “الخروج وتجاهل التغييرات” returns Home. Home tile navigation is not guarded. Navigation ignores repeated tile requests during screen loading and preserves deferred async loads.

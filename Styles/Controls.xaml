@@ -34,8 +34,8 @@
 
     <!-- Home navigation tiles -->
     <Style x:Key="HomeTileButtonStyle" TargetType="Button">
-        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}" />
-        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="Background" Value="{StaticResource HomeSalesTileBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource HomeTileTextBrush}" />
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Padding" Value="18" />
@@ -74,7 +74,13 @@
                             </Setter>
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="TileBorder" Property="BorderBrush" Value="{StaticResource PrimaryBlueBrush}" />
+                            <Setter TargetName="TileBorder" Property="BorderBrush" Value="#FFFFFF" />
+                            <Setter TargetName="TileBorder" Property="BorderThickness" Value="3" />
+                            <Setter TargetName="TileBorder" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect BlurRadius="0" Direction="0" ShadowDepth="0" Opacity="1" Color="#0F172A" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="TileBorder" Property="RenderTransform">
@@ -87,6 +93,47 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding DataContext.Title, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                         Value="المبيعات">
+                <Setter Property="Background" Value="{StaticResource HomeSalesTileBrush}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding DataContext.Title, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                         Value="المشتريات والمخزون">
+                <Setter Property="Background" Value="{StaticResource HomeOperationsTileBrush}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding DataContext.Title, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                         Value="المالية والتحليل">
+                <Setter Property="Background" Value="{StaticResource HomeFinanceTileBrush}" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding DataContext.Title, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                               Value="المبيعات" />
+                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}"
+                               Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="{StaticResource HomeSalesTileHoverBrush}" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding DataContext.Title, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                               Value="المشتريات والمخزون" />
+                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}"
+                               Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="{StaticResource HomeOperationsTileHoverBrush}" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding DataContext.Title, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                               Value="المالية والتحليل" />
+                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}"
+                               Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="{StaticResource HomeFinanceTileHoverBrush}" />
+            </MultiDataTrigger>
+        </Style.Triggers>
     </Style>
 
     <!-- نمط الزر الرئيسي (Primary Action Button) -->

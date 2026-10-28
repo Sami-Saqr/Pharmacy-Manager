@@ -7,8 +7,10 @@ namespace CarPartManager.Models
         public NavItem NavigationItem { get; }
         public string Description { get; }
         public bool IsProminent { get; }
-        public double Width => IsProminent ? 484 : 236;
-        public double Height => IsProminent ? 200 : 152;
+        public double Width => IsProminent ? 500 : 260;
+        public double MinWidth => IsProminent ? 320 : 236;
+        public double Height => IsProminent ? 232 : 196;
+        public double MinHeight => IsProminent ? 220 : 180;
         public Brush AccentBrush { get; }
         public Brush AccentLightBrush { get; }
 

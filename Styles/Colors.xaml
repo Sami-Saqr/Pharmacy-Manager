@@ -31,6 +31,16 @@
     <Color x:Key="InvoicesIndigoLight">#EEF2FF</Color>
     <SolidColorBrush x:Key="InvoicesIndigoLightBrush" Color="{StaticResource InvoicesIndigoLight}" />
 
+    <!-- Filled Home tile backgrounds, darkened for strong white-text contrast -->
+    <SolidColorBrush x:Key="HomeSalesTileBrush" Color="#047857" />
+    <SolidColorBrush x:Key="HomeSalesTileHoverBrush" Color="#065F46" />
+    <SolidColorBrush x:Key="HomeOperationsTileBrush" Color="#1D4ED8" />
+    <SolidColorBrush x:Key="HomeOperationsTileHoverBrush" Color="#1E40AF" />
+    <SolidColorBrush x:Key="HomeFinanceTileBrush" Color="#5B21B6" />
+    <SolidColorBrush x:Key="HomeFinanceTileHoverBrush" Color="#4C1D95" />
+    <SolidColorBrush x:Key="HomeTileTextBrush" Color="#F8FAFC" />
+    <SolidColorBrush x:Key="HomeTileIconBackgroundBrush" Color="#33FFFFFF" />
+
     <Color x:Key="ProductsTeal">#0891B2</Color>
     <SolidColorBrush x:Key="ProductsTealBrush" Color="{StaticResource ProductsTeal}" />
     <Color x:Key="ProductsTealLight">#ECFEFF</Color>

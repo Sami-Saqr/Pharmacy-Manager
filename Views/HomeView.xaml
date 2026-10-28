@@ -30,7 +30,7 @@
                                             Background="{Binding AccentBrush}"
                                             Margin="0,0,10,0" />
                                     <TextBlock Text="{Binding Title}"
-                                               FontSize="16"
+                                               FontSize="23"
                                                FontWeight="Bold"
                                                Foreground="{StaticResource TextPrimaryBrush}"
                                                VerticalAlignment="Center" />
@@ -46,35 +46,51 @@
                                         <DataTemplate>
                                             <Button Style="{StaticResource HomeTileButtonStyle}"
                                                     Width="{Binding Width}"
+                                                    MinWidth="{Binding MinWidth}"
                                                     Height="{Binding Height}"
+                                                    MinHeight="{Binding MinHeight}"
                                                     Margin="0,0,12,12"
                                                     Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding NavigationItem}">
                                                 <StackPanel VerticalAlignment="Center">
-                                                    <Border Width="40"
-                                                            Height="40"
-                                                            CornerRadius="10"
-                                                            Background="{Binding AccentLightBrush}"
+                                                    <Border Width="44"
+                                                            Height="44"
+                                                            CornerRadius="22"
+                                                            Background="{StaticResource HomeTileIconBackgroundBrush}"
                                                             HorizontalAlignment="Right"
                                                             Margin="0,0,0,12">
                                                         <Path Data="{Binding NavigationItem.IconPathData}"
-                                                              Fill="{Binding AccentBrush}"
-                                                              Width="19"
-                                                              Height="19"
+                                                              Fill="{StaticResource HomeTileTextBrush}"
+                                                              Width="21"
+                                                              Height="21"
                                                               Stretch="Uniform"
                                                               HorizontalAlignment="Center"
                                                               VerticalAlignment="Center" />
                                                     </Border>
                                                     <TextBlock Text="{Binding NavigationItem.Title}"
-                                                               FontSize="14"
-                                                               FontWeight="Bold"
-                                                               Foreground="{StaticResource TextPrimaryBrush}"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{StaticResource HomeTileTextBrush}"
+                                                               TextWrapping="Wrap"
+                                                               MaxHeight="54"
                                                                TextTrimming="CharacterEllipsis"
-                                                               ToolTip="{Binding NavigationItem.Title}" />
+                                                               ToolTip="{Binding NavigationItem.Title}">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="FontSize" Value="20" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsProminent}" Value="True">
+                                                                        <Setter Property="FontSize" Value="26" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
                                                     <TextBlock Text="{Binding Description}"
-                                                               FontSize="11"
-                                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                                               FontSize="14"
+                                                               Foreground="{StaticResource HomeTileTextBrush}"
                                                                Margin="0,5,0,0"
+                                                               TextWrapping="Wrap"
+                                                               MaxHeight="38"
                                                                TextTrimming="CharacterEllipsis"
                                                                ToolTip="{Binding Description}" />
                                                 </StackPanel>
