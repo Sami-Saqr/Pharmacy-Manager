@@ -16,49 +16,53 @@ namespace CarPartManager.Services
             try
             {
                 using var context = CreateContext();
-
                 var summary = new DashboardSummaryDto();
+                var today = DateTime.Today;
+                var tomorrow = today.AddDays(1);
 
-                // 1. استخراج إحصائيات الأصناف والمخزون
-                var products = await context.Products.AsNoTracking().ToListAsync();
-                summary.TotalProductsCount = products.Count;
-                summary.TotalPiecesCount = products.Sum(p => p.Quantity);
-                summary.TotalCategoriesCount = products
+                var productStats = await context.Products.AsNoTracking()
+                    .GroupBy(_ => 1)
+                    .Select(products => new
+                    {
+                        Count = products.Count(),
+                        Pieces = products.Sum(p => p.Quantity),
+                        InventoryCost = products.Sum(p => p.Quantity * p.PurchasePrice)
+                    })
+                    .SingleOrDefaultAsync();
+
+                summary.TotalProductsCount = productStats?.Count ?? 0;
+                summary.TotalPiecesCount = productStats?.Pieces ?? 0;
+                summary.TotalInventoryCost = productStats?.InventoryCost ?? 0m;
+                var categories = await context.Products.AsNoTracking()
                     .Select(p => p.Category)
-                    .Where(c => !string.IsNullOrWhiteSpace(c))
                     .Distinct()
-                    .Count();
-                summary.TotalInventoryCost = products.Sum(p => p.Quantity * p.PurchasePrice);
+                    .ToListAsync();
+                summary.TotalCategoriesCount = categories.Count(category => !string.IsNullOrWhiteSpace(category));
 
-                // النواقص الحرجة: الأصناف التي وصلت إلى أو قلت عن حد الطلب الأدنى
-                var lowStock = products
+                var lowStockProducts = await context.Products.AsNoTracking()
                     .Where(p => p.Quantity <= p.MinimumStock)
                     .OrderBy(p => p.Quantity)
                     .ThenBy(p => p.MinimumStock - p.Quantity)
-                    .ToList();
+                    .Select(p => new
+                    {
+                        p.PartNumber,
+                        p.Name,
+                        p.CompatibleVehicles,
+                        p.Quantity,
+                        p.MinimumStock,
+                        p.SellingPrice,
+                        p.PurchasePrice
+                    })
+                    .ToListAsync();
 
-                summary.LowStockProductsCount = lowStock.Count;
-
-                summary.LowStockItems = lowStock.Select(p =>
+                summary.LowStockProductsCount = lowStockProducts.Count;
+                summary.LowStockItems = lowStockProducts.Select(p =>
                 {
-                    string urgencyText;
-                    string urgencyColor;
-
-                    if (p.Quantity <= 0)
-                    {
-                        urgencyText = "نفد تماماً";
-                        urgencyColor = "#DC2626"; // أحمر غامق
-                    }
-                    else if (p.Quantity <= Math.Max(1, p.MinimumStock / 2))
-                    {
-                        urgencyText = "حرج جداً";
-                        urgencyColor = "#DC2626";
-                    }
-                    else
-                    {
-                        urgencyText = "منخفض";
-                        urgencyColor = "#D97706"; // كهرماني
-                    }
+                    var (urgencyText, urgencyColor) = p.Quantity <= 0
+                        ? ("نفد تماماً", "#DC2626")
+                        : p.Quantity <= Math.Max(1, p.MinimumStock / 2)
+                            ? ("حرج جداً", "#DC2626")
+                            : ("منخفض", "#D97706");
 
                     return new LowStockItem
                     {
@@ -74,119 +78,186 @@ namespace CarPartManager.Services
                     };
                 }).ToList();
 
-                // 2. إحصائيات فواتير المشتريات والمبيعات المعتمدة اليوم
-                var today = DateTime.Today;
+                var purchaseStats = await context.PurchaseInvoices.AsNoTracking()
+                    .GroupBy(_ => 1)
+                    .Select(invoices => new
+                    {
+                        Count = invoices.Count(),
+                        TodayCount = invoices.Count(p => p.Status == "معتمدة" &&
+                            ((p.PostedDate.HasValue && p.PostedDate.Value >= today && p.PostedDate.Value < tomorrow) ||
+                             (!p.PostedDate.HasValue && p.InvoiceDate >= today && p.InvoiceDate < tomorrow))),
+                        TodayTotal = invoices.Sum(p => p.Status == "معتمدة" &&
+                            ((p.PostedDate.HasValue && p.PostedDate.Value >= today && p.PostedDate.Value < tomorrow) ||
+                             (!p.PostedDate.HasValue && p.InvoiceDate >= today && p.InvoiceDate < tomorrow))
+                                ? p.TotalAmount
+                                : 0m)
+                    })
+                    .SingleOrDefaultAsync();
 
-                var allPurchaseInvoices = await context.PurchaseInvoices.AsNoTracking().ToListAsync();
-                summary.TotalPurchasesCount = allPurchaseInvoices.Count;
+                summary.TotalPurchasesCount = purchaseStats?.Count ?? 0;
+                summary.TodayPurchasesCount = purchaseStats?.TodayCount ?? 0;
+                summary.TodayPurchasesTotal = purchaseStats?.TodayTotal ?? 0m;
 
-                var todayPostedPurchases = allPurchaseInvoices
-                    .Where(p => p.Status == "معتمدة" &&
-                        ((p.PostedDate.HasValue && p.PostedDate.Value.Date == today) ||
-                         (!p.PostedDate.HasValue && p.InvoiceDate.Date == today)))
-                    .ToList();
+                var salesStats = await context.SalesInvoices.AsNoTracking()
+                    .GroupBy(_ => 1)
+                    .Select(invoices => new
+                    {
+                        Count = invoices.Count(),
+                        TodayCount = invoices.Count(s => s.Status == "معتمدة" &&
+                            ((s.PostedDate.HasValue && s.PostedDate.Value >= today && s.PostedDate.Value < tomorrow) ||
+                             (!s.PostedDate.HasValue && s.InvoiceDate >= today && s.InvoiceDate < tomorrow))),
+                        TodayTotal = invoices.Sum(s => s.Status == "معتمدة" &&
+                            ((s.PostedDate.HasValue && s.PostedDate.Value >= today && s.PostedDate.Value < tomorrow) ||
+                             (!s.PostedDate.HasValue && s.InvoiceDate >= today && s.InvoiceDate < tomorrow))
+                                ? s.GrandTotal
+                                : 0m)
+                    })
+                    .SingleOrDefaultAsync();
 
-                summary.TodayPurchasesCount = todayPostedPurchases.Count;
-                summary.TodayPurchasesTotal = todayPostedPurchases.Sum(p => p.TotalAmount);
+                summary.TotalSalesCount = salesStats?.Count ?? 0;
+                summary.TodaySalesCount = salesStats?.TodayCount ?? 0;
+                summary.TodaySalesTotal = salesStats?.TodayTotal ?? 0m;
 
-                // إحصائيات فواتير المبيعات
-                var allSalesInvoices = await context.SalesInvoices.AsNoTracking().ToListAsync();
-                summary.TotalSalesCount = allSalesInvoices.Count;
+                var salesReturnStats = await context.SalesReturns.AsNoTracking()
+                    .GroupBy(_ => 1)
+                    .Select(returns => new
+                    {
+                        Count = returns.Count(),
+                        TodayCount = returns.Count(r => r.Status == "معتمدة" && r.ReturnDate >= today && r.ReturnDate < tomorrow),
+                        TodayTotal = returns.Sum(r => r.Status == "معتمدة" && r.ReturnDate >= today && r.ReturnDate < tomorrow
+                            ? r.TotalAmount
+                            : 0m)
+                    })
+                    .SingleOrDefaultAsync();
 
-                var todayPostedSales = allSalesInvoices
-                    .Where(s => s.Status == "معتمدة" &&
-                        ((s.PostedDate.HasValue && s.PostedDate.Value.Date == today) ||
-                         (!s.PostedDate.HasValue && s.InvoiceDate.Date == today)))
-                    .ToList();
+                summary.TodaySalesReturnsCount = salesReturnStats?.TodayCount ?? 0;
+                summary.TodaySalesReturnsTotal = salesReturnStats?.TodayTotal ?? 0m;
 
-                summary.TodaySalesCount = todayPostedSales.Count;
-                summary.TodaySalesTotal = todayPostedSales.Sum(s => s.GrandTotal);
+                var purchaseReturnStats = await context.PurchaseReturns.AsNoTracking()
+                    .GroupBy(_ => 1)
+                    .Select(returns => new
+                    {
+                        Count = returns.Count(),
+                        TodayCount = returns.Count(r => r.Status == "معتمدة" && r.ReturnDate >= today && r.ReturnDate < tomorrow),
+                        TodayTotal = returns.Sum(r => r.Status == "معتمدة" && r.ReturnDate >= today && r.ReturnDate < tomorrow
+                            ? r.TotalAmount
+                            : 0m)
+                    })
+                    .SingleOrDefaultAsync();
 
-                // إحصائيات المرتجعات المعتمدة
-                var allSalesReturns = await context.SalesReturns.AsNoTracking().ToListAsync();
-                var allPurchaseReturns = await context.PurchaseReturns.AsNoTracking().ToListAsync();
+                summary.TodayPurchaseReturnsCount = purchaseReturnStats?.TodayCount ?? 0;
+                summary.TodayPurchaseReturnsTotal = purchaseReturnStats?.TodayTotal ?? 0m;
+                summary.TotalReturnsCount = (salesReturnStats?.Count ?? 0) + (purchaseReturnStats?.Count ?? 0);
 
-                var todaySalesReturns = allSalesReturns.Where(r => r.Status == "معتمدة" && r.ReturnDate.Date == today).ToList();
-                var todayPurchaseReturns = allPurchaseReturns.Where(r => r.Status == "معتمدة" && r.ReturnDate.Date == today).ToList();
+                var recentInvoices = new List<(DateTime Date, int Id, RecentInvoiceSummary Summary)>();
 
-                summary.TodaySalesReturnsCount = todaySalesReturns.Count;
-                summary.TodaySalesReturnsTotal = todaySalesReturns.Sum(r => r.TotalAmount);
-                summary.TodayPurchaseReturnsCount = todayPurchaseReturns.Count;
-                summary.TodayPurchaseReturnsTotal = todayPurchaseReturns.Sum(r => r.TotalAmount);
-                summary.TotalReturnsCount = allSalesReturns.Count + allPurchaseReturns.Count;
-
-                // 3. آخر الفواتير والمرتجعات مرتبة من الأحدث للأقدم
-                string FormatTime(DateTime dt)
+                void AddRecent(DateTime date, int id, string code, string party, string type, decimal amount, string payment, string color)
                 {
-                    if (dt.Date == today) return $"اليوم {dt:hh:mm tt}";
-                    if (dt.Date == today.AddDays(-1)) return $"أمس {dt:hh:mm tt}";
-                    return dt.ToString("yyyy/MM/dd");
+                    recentInvoices.Add((date, id, new RecentInvoiceSummary
+                    {
+                        InvoiceCode = code,
+                        PartyName = party,
+                        TypeName = type,
+                        TotalAmount = amount,
+                        PaymentMethod = payment,
+                        BadgeColor = color
+                    }));
                 }
 
-                var purchaseItems = allPurchaseInvoices.Select(inv => new
-                {
-                    Date = inv.InvoiceDate,
-                    inv.Id,
-                    Code = inv.InvoiceNumber,
-                    Party = string.IsNullOrWhiteSpace(inv.SupplierName) ? "مورد عام" : inv.SupplierName,
-                    Type = inv.Status == "معتمدة" ? "فاتورة مشتريات (معتمدة)" : (inv.Status == "ملغاة" ? "فاتورة مشتريات (ملغاة)" : "مسودة مشتريات"),
-                    Amount = inv.TotalAmount,
-                    Payment = inv.Status == "ملغاة" ? "ملغاة" : inv.Status,
-                    BadgeColor = inv.Status == "معتمدة" ? "#059669" : (inv.Status == "ملغاة" ? "#DC2626" : "#D97706")
-                });
-
-                var salesItems = allSalesInvoices.Select(inv => new
-                {
-                    Date = inv.InvoiceDate,
-                    inv.Id,
-                    Code = inv.InvoiceNumber,
-                    Party = string.IsNullOrWhiteSpace(inv.CustomerName) ? "عميل نقدي" : inv.CustomerName,
-                    Type = inv.Status == "معتمدة" ? "فاتورة مبيعات (معتمدة)" : (inv.Status == "ملغاة" ? "فاتورة مبيعات (ملغاة)" : "مسودة مبيعات"),
-                    Amount = inv.GrandTotal,
-                    Payment = inv.Status == "ملغاة" ? "ملغاة" : inv.PaymentMethod,
-                    BadgeColor = inv.Status == "معتمدة" ? "#059669" : (inv.Status == "ملغاة" ? "#DC2626" : "#D97706")
-                });
-
-                var salesReturnItems = allSalesReturns.Select(ret => new
-                {
-                    Date = ret.ReturnDate,
-                    ret.Id,
-                    Code = ret.ReturnNumber,
-                    Party = !string.IsNullOrWhiteSpace(ret.CustomerName) ? ret.CustomerName : "عميل نقدي",
-                    Type = "مرتجع مبيعات (معتمد)",
-                    Amount = ret.TotalAmount,
-                    Payment = string.IsNullOrWhiteSpace(ret.Reason) ? "مرتجع" : ret.Reason,
-                    BadgeColor = "#2563EB"
-                });
-
-                var purchaseReturnItems = allPurchaseReturns.Select(ret => new
-                {
-                    Date = ret.ReturnDate,
-                    ret.Id,
-                    Code = ret.ReturnNumber,
-                    Party = !string.IsNullOrWhiteSpace(ret.SupplierName) ? ret.SupplierName : "مورد",
-                    Type = "مرتجع مشتريات (معتمد)",
-                    Amount = ret.TotalAmount,
-                    Payment = string.IsNullOrWhiteSpace(ret.Reason) ? "مرتجع" : ret.Reason,
-                    BadgeColor = "#7C3AED"
-                });
-
-                summary.RecentInvoices = purchaseItems.Concat(salesItems).Concat(salesReturnItems).Concat(purchaseReturnItems)
-                    .OrderByDescending(x => x.Date)
-                    .ThenByDescending(x => x.Id)
+                var recentPurchases = await context.PurchaseInvoices.AsNoTracking()
+                    .OrderByDescending(p => p.InvoiceDate)
+                    .ThenByDescending(p => p.Id)
                     .Take(7)
-                    .Select(inv => new RecentInvoiceSummary
-                    {
-                        InvoiceCode = inv.Code,
-                        PartyName = inv.Party,
-                        TypeName = inv.Type,
-                        TimeFormatted = FormatTime(inv.Date),
-                        TotalAmount = inv.Amount,
-                        PaymentMethod = inv.Payment,
-                        BadgeColor = inv.BadgeColor
-                    }).ToList();
+                    .Select(p => new { p.InvoiceDate, p.Id, p.InvoiceNumber, p.SupplierName, p.Status, p.TotalAmount })
+                    .ToListAsync();
+                foreach (var invoice in recentPurchases)
+                {
+                    AddRecent(
+                        invoice.InvoiceDate,
+                        invoice.Id,
+                        invoice.InvoiceNumber,
+                        string.IsNullOrWhiteSpace(invoice.SupplierName) ? "مورد عام" : invoice.SupplierName,
+                        invoice.Status == "معتمدة" ? "فاتورة مشتريات (معتمدة)" : invoice.Status == "ملغاة" ? "فاتورة مشتريات (ملغاة)" : "مسودة مشتريات",
+                        invoice.TotalAmount,
+                        invoice.Status == "ملغاة" ? "ملغاة" : invoice.Status,
+                        invoice.Status == "معتمدة" ? "#059669" : invoice.Status == "ملغاة" ? "#DC2626" : "#D97706");
+                }
 
-                // 4. إحصائيات الموردين وحركات المخزون
+                var recentSales = await context.SalesInvoices.AsNoTracking()
+                    .OrderByDescending(s => s.InvoiceDate)
+                    .ThenByDescending(s => s.Id)
+                    .Take(7)
+                    .Select(s => new { s.InvoiceDate, s.Id, s.InvoiceNumber, s.CustomerName, s.Status, s.GrandTotal, s.PaymentMethod })
+                    .ToListAsync();
+                foreach (var invoice in recentSales)
+                {
+                    AddRecent(
+                        invoice.InvoiceDate,
+                        invoice.Id,
+                        invoice.InvoiceNumber,
+                        string.IsNullOrWhiteSpace(invoice.CustomerName) ? "عميل نقدي" : invoice.CustomerName,
+                        invoice.Status == "معتمدة" ? "فاتورة مبيعات (معتمدة)" : invoice.Status == "ملغاة" ? "فاتورة مبيعات (ملغاة)" : "مسودة مبيعات",
+                        invoice.GrandTotal,
+                        invoice.Status == "ملغاة" ? "ملغاة" : invoice.PaymentMethod,
+                        invoice.Status == "معتمدة" ? "#059669" : invoice.Status == "ملغاة" ? "#DC2626" : "#D97706");
+                }
+
+                var recentSalesReturns = await context.SalesReturns.AsNoTracking()
+                    .OrderByDescending(r => r.ReturnDate)
+                    .ThenByDescending(r => r.Id)
+                    .Take(7)
+                    .Select(r => new { r.ReturnDate, r.Id, r.ReturnNumber, r.CustomerName, r.TotalAmount, r.Reason })
+                    .ToListAsync();
+                foreach (var invoice in recentSalesReturns)
+                {
+                    AddRecent(
+                        invoice.ReturnDate,
+                        invoice.Id,
+                        invoice.ReturnNumber,
+                        string.IsNullOrWhiteSpace(invoice.CustomerName) ? "عميل نقدي" : invoice.CustomerName,
+                        "مرتجع مبيعات (معتمد)",
+                        invoice.TotalAmount,
+                        string.IsNullOrWhiteSpace(invoice.Reason) ? "مرتجع" : invoice.Reason,
+                        "#2563EB");
+                }
+
+                var recentPurchaseReturns = await context.PurchaseReturns.AsNoTracking()
+                    .OrderByDescending(r => r.ReturnDate)
+                    .ThenByDescending(r => r.Id)
+                    .Take(7)
+                    .Select(r => new { r.ReturnDate, r.Id, r.ReturnNumber, r.SupplierName, r.TotalAmount, r.Reason })
+                    .ToListAsync();
+                foreach (var invoice in recentPurchaseReturns)
+                {
+                    AddRecent(
+                        invoice.ReturnDate,
+                        invoice.Id,
+                        invoice.ReturnNumber,
+                        string.IsNullOrWhiteSpace(invoice.SupplierName) ? "مورد" : invoice.SupplierName,
+                        "مرتجع مشتريات (معتمد)",
+                        invoice.TotalAmount,
+                        string.IsNullOrWhiteSpace(invoice.Reason) ? "مرتجع" : invoice.Reason,
+                        "#7C3AED");
+                }
+
+                string FormatTime(DateTime date)
+                {
+                    if (date.Date == today) return $"اليوم {date:hh:mm tt}";
+                    if (date.Date == today.AddDays(-1)) return $"أمس {date:hh:mm tt}";
+                    return date.ToString("yyyy/MM/dd");
+                }
+
+                summary.RecentInvoices = recentInvoices
+                    .OrderByDescending(invoice => invoice.Date)
+                    .ThenByDescending(invoice => invoice.Id)
+                    .Take(7)
+                    .Select(invoice =>
+                    {
+                        invoice.Summary.TimeFormatted = FormatTime(invoice.Date);
+                        return invoice.Summary;
+                    })
+                    .ToList();
+
                 summary.TotalSuppliersCount = await context.Suppliers.CountAsync();
                 summary.TotalInventoryMovementsCount = await context.InventoryMovements.CountAsync();
                 summary.LastUpdated = DateTime.Now;
