@@ -195,11 +195,11 @@
                                   HorizontalScrollBarVisibility="Auto"
                                   VerticalScrollBarVisibility="Auto">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="الاسم" Binding="{Binding Name}" Width="*" MinWidth="180"
+                                <DataGridTextColumn Header="الاسم" Binding="{Binding Name}" Width="2*" MinWidth="180"
                                                     ElementStyle="{StaticResource DataGridTextCellStyle}" />
-                                <DataGridTextColumn Header="الباركود" Binding="{Binding Barcode}" Width="120" MinWidth="90"
+                                <DataGridTextColumn Header="الباركود" Binding="{Binding Barcode}" Width="*" MinWidth="100"
                                                     ElementStyle="{StaticResource DataGridTextCellStyle}" />
-                                <DataGridTextColumn Header="التصنيف" Binding="{Binding Category}" Width="120" MinWidth="90"
+                                <DataGridTextColumn Header="التصنيف" Binding="{Binding Category}" Width="*" MinWidth="100"
                                                     ElementStyle="{StaticResource DataGridTextCellStyle}" />
                                 <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="80" MinWidth="64" />
                                 <DataGridTextColumn Header="حد الطلب" Binding="{Binding MinimumStock}" Width="80" MinWidth="64" />
@@ -348,16 +348,16 @@
                                       VerticalScrollBarVisibility="Auto">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="التاريخ" Binding="{Binding MovementDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Width="150" MinWidth="140" />
-                                    <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="2*" MinWidth="180"
+                                    <DataGridTextColumn Header="الصنف" Binding="{Binding ProductName}" Width="*" MinWidth="180"
                                                         ElementStyle="{StaticResource DataGridTextCellStyle}" />
-                                    <DataGridTextColumn Header="النوع" Binding="{Binding MovementType}" Width="160" MinWidth="120"
+                                    <DataGridTextColumn Header="النوع" Binding="{Binding MovementType}" Width="*" MinWidth="120"
                                                         ElementStyle="{StaticResource DataGridTextCellStyle}" />
                                     <DataGridTextColumn Header="التغيير" Binding="{Binding QuantityChange, StringFormat='{}{0:+0;-0}'}" Width="80" MinWidth="64" />
                                     <DataGridTextColumn Header="قبل" Binding="{Binding PreviousQuantity}" Width="70" MinWidth="60" />
                                     <DataGridTextColumn Header="بعد" Binding="{Binding NewQuantity}" Width="70" MinWidth="60" />
                                     <DataGridTextColumn Header="المرجع" Binding="{Binding ReferenceNumber}" Width="120" MinWidth="90"
                                                         ElementStyle="{StaticResource DataGridTextCellStyle}" />
-                                    <DataGridTextColumn Header="ملاحظات" Binding="{Binding Notes}" Width="2*" MinWidth="160"
+                                    <DataGridTextColumn Header="ملاحظات" Binding="{Binding Notes}" Width="*" MinWidth="160"
                                                         ElementStyle="{StaticResource DataGridTextCellStyle}" />
                                 </DataGrid.Columns>
                             </DataGrid>
@@ -544,7 +544,7 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="الاسم" Binding="{Binding ProductName}" Width="*" MinWidth="180"
                                                     ElementStyle="{StaticResource DataGridTextCellStyle}" />
-                                <DataGridTextColumn Header="الباركود" Binding="{Binding Barcode}" Width="120" MinWidth="90"
+                                <DataGridTextColumn Header="الباركود" Binding="{Binding Barcode}" Width="*" MinWidth="100"
                                                     ElementStyle="{StaticResource DataGridTextCellStyle}" />
                                 <DataGridTextColumn Header="الرصيد وقت العد" Binding="{Binding BookQuantity}" Width="110" MinWidth="90" />
                                 <DataGridTextColumn Header="المعدود" Binding="{Binding CountedQuantity}" Width="80" MinWidth="64" />
