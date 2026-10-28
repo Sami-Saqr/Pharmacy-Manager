@@ -204,7 +204,9 @@
                     <!-- جدول العملاء -->
                     <DataGrid Grid.Row="1"
                               ItemsSource="{Binding FilteredCustomers}"
-                              SelectedItem="{Binding SelectedCustomer, Mode=TwoWay}">
+                              SelectedItem="{Binding SelectedCustomer, Mode=TwoWay}"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto">
                         <DataGrid.Style>
                             <Style TargetType="DataGrid" BasedOn="{StaticResource CleanDataGridStyle}">
                                 <Setter Property="Visibility" Value="Visible" />
@@ -219,10 +221,10 @@
                             </Style>
                         </DataGrid.Style>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="#" Binding="{Binding Id}" Width="45" />
+                            <DataGridTextColumn Header="#" Binding="{Binding Id}" Width="45" MinWidth="40" />
 
                             <!-- اسم العميل -->
-                            <DataGridTemplateColumn Header="اسم العميل" Width="*">
+                            <DataGridTemplateColumn Header="اسم العميل" Width="*" MinWidth="160">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel VerticalAlignment="Center" Margin="0,4,0,4">
@@ -243,10 +245,11 @@
 
                             <!-- الهاتف -->
                             <DataGridTextColumn Header="الهاتف"
-                                                Binding="{Binding Phone}" Width="120" />
+                                                Binding="{Binding Phone}" Width="120" MinWidth="100"
+                                                ElementStyle="{StaticResource DataGridTextCellStyle}" />
 
                             <!-- الرصيد -->
-                            <DataGridTemplateColumn Header="الرصيد المستحق" Width="130">
+                            <DataGridTemplateColumn Header="الرصيد المستحق" Width="130" MinWidth="110">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border CornerRadius="4" Padding="8,3"
@@ -282,7 +285,7 @@
                             </DataGridTemplateColumn>
 
                             <!-- الحالة -->
-                            <DataGridTemplateColumn Header="الحالة" Width="90">
+                            <DataGridTemplateColumn Header="الحالة" Width="90" MinWidth="80">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border CornerRadius="4" Padding="8,2"
@@ -298,7 +301,9 @@
                                                 </Style>
                                             </Border.Style>
                                             <TextBlock Text="{Binding StatusText}"
-                                                       FontSize="11" FontWeight="SemiBold">
+                                                       FontSize="11" FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       ToolTip="{Binding StatusText}">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
                                                         <Setter Property="Foreground" Value="#166534" />
@@ -316,7 +321,7 @@
                             </DataGridTemplateColumn>
 
                             <!-- أزرار الإجراءات -->
-                            <DataGridTemplateColumn Header="إجراءات" Width="190">
+                            <DataGridTemplateColumn Header="إجراءات" Width="200" MinWidth="190">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" Margin="4,2">
@@ -603,13 +608,15 @@
             <!-- جدول كشف الحساب -->
             <Border Grid.Row="1" Style="{StaticResource ContentPanelCardStyle}">
                 <DataGrid Style="{StaticResource CleanDataGridStyle}"
-                          ItemsSource="{Binding StatementLines}">
+                          ItemsSource="{Binding StatementLines}"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="التاريخ"
                                             Binding="{Binding Date, StringFormat={}{0:d/M/yyyy}}"
-                                            Width="90" />
+                                            Width="90" MinWidth="80" />
 
-                        <DataGridTemplateColumn Header="نوع الحركة" Width="105">
+                        <DataGridTemplateColumn Header="نوع الحركة" Width="110" MinWidth="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border CornerRadius="4" Padding="6,2"
@@ -655,10 +662,11 @@
                         </DataGridTemplateColumn>
 
                         <DataGridTextColumn Header="المرجع"
-                                            Binding="{Binding Reference}" Width="95" />
+                                            Binding="{Binding Reference}" Width="95" MinWidth="80"
+                                            ElementStyle="{StaticResource DataGridTextCellStyle}" />
 
                         <!-- إجمالي الفاتورة -->
-                        <DataGridTemplateColumn Header="إجمالي الفاتورة" Width="95">
+                        <DataGridTemplateColumn Header="إجمالي الفاتورة" Width="95" MinWidth="85">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock
@@ -680,7 +688,7 @@
                         </DataGridTemplateColumn>
 
                         <!-- المدفوع بالفاتورة -->
-                        <DataGridTemplateColumn Header="مدفوع بالفاتورة" Width="95">
+                        <DataGridTemplateColumn Header="مدفوع بالفاتورة" Width="95" MinWidth="85">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock
@@ -702,7 +710,7 @@
                         </DataGridTemplateColumn>
 
                         <!-- مدين (المتبقي) -->
-                        <DataGridTemplateColumn Header="مدين ▲" Width="95">
+                        <DataGridTemplateColumn Header="مدين ▲" Width="95" MinWidth="80">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock
@@ -727,7 +735,7 @@
                         </DataGridTemplateColumn>
 
                         <!-- دائن (الدفعة) -->
-                        <DataGridTemplateColumn Header="دائن ▼" Width="95">
+                        <DataGridTemplateColumn Header="دائن ▼" Width="95" MinWidth="80">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock
@@ -752,7 +760,7 @@
                         </DataGridTemplateColumn>
 
                         <!-- الرصيد التراكمي -->
-                        <DataGridTemplateColumn Header="الرصيد التراكمي" Width="105">
+                        <DataGridTemplateColumn Header="الرصيد التراكمي" Width="110" MinWidth="95">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock
@@ -776,7 +784,7 @@
                         </DataGridTemplateColumn>
 
                         <!-- البيان -->
-                        <DataGridTemplateColumn Header="البيان" Width="*">
+                        <DataGridTemplateColumn Header="البيان" Width="*" MinWidth="140">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Description}"
@@ -788,7 +796,7 @@
                         </DataGridTemplateColumn>
 
                         <!-- إجراءات السطر (إلغاء الدفعة) -->
-                        <DataGridTemplateColumn Header="إجراء" Width="85">
+                        <DataGridTemplateColumn Header="إجراء" Width="110" MinWidth="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button Content="إلغاء الدفعة"
