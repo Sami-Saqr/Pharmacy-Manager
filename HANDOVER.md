@@ -1,5 +1,20 @@
 ﻿# CarPartManager - Handover Document
 
+## Latest: Navigation and cashier responsiveness implementation — branch `fix-performance`
+**Date:** 2026-10-28
+
+**Changes:** `MainViewModel` now assigns the destination ViewModel before queuing its first/refresh load at background dispatcher priority. Removed constructor-started loads from the navigated screens to avoid duplicate startup queries. Added a non-blocking Arabic loading indicator in `MainWindow.xaml`, guarded duplicate in-flight loads per ViewModel, ignored superseded queued navigations, and queued a refresh when returning to a screen whose earlier load is still active. `App.OnStartup` initialization remains one-time; per-operation DbContexts remain unchanged.
+
+**Cashier and dashboard:** Added a header-only invoice-summary query and used it for POS/history lists; `GetAllInvoicesAsync` remains available with invoice items for callers that need the full graph. POS invoice posting now fetches all relevant tracked products in one query before validating and updating stock, while preserving per-line checks and movements. Dashboard totals/counts are aggregated in SQLite, low-stock details are projected, and only the newest seven rows per source are read to construct the same seven-item recent-activity list. Customer-suggestion failures now set an Arabic status and are reported to the user rather than silently swallowed.
+
+**Purchase entry:** Replaced the page-level `ScrollViewer`/`StackPanel` with bounded `Grid` rows; the invoice-items `DataGrid` occupies a star-sized row and keeps internal automatic scrollbars with recycling virtualization enabled. Other DataGrid screens were not changed because no matching virtualization defect was identified in the diagnosis.
+
+**Navigation limitation:** Already-running database calls are not cancellable because the service methods do not accept cancellation tokens. Superseded queued loads are skipped; a screen is not loaded concurrently with itself, and returning during a load queues a fresh read. Runtime timing and visual behavior were not measured because the app was not run.
+
+**Validation:** Main-project builds succeeded with 0 errors and the same 8 pre-existing nullable warnings in `ViewModels/InventoryViewModel.cs:218-221`. The test project compiled successfully with 0 warnings and 0 errors; tests were not run to avoid touching database files. No `.db` files were accessed, no schema/packages/business rules changed, and no timing instrumentation was added.
+
+**Manual verification required:** At 1340×820 and the minimum 1040×680, click Dashboard, Inventory, Products, POS, Sales History, Purchase Entry, and Reports; confirm the destination shell appears before the loading indicator, rapid navigation does not leave a stale screen, and re-entry refreshes data. In POS, test customer suggestions, barcode add/re-scan, saving/posting an invoice, stock freshness after returning to Inventory, and history filtering. Compare Dashboard totals/recent activity with the corresponding records. In Purchase Entry, resize while viewing line items and confirm columns remain separated and the grid scrolls internally. Measure click-to-shell time manually; the under-150 ms target is not verified here.
+
 ## Latest: Navigation and cashier performance diagnosis — branch `fix-performance`
 **Date:** 2026-10-28
 
