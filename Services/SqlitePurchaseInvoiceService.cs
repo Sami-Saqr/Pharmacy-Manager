@@ -59,6 +59,51 @@ namespace CarPartManager.Services
             }
         }
 
+        public async Task<IReadOnlyList<InvoiceExportRecord>> GetInvoicesForExportAsync(string? searchQuery)
+        {
+            using var context = CreateContext();
+            var query = context.PurchaseInvoices.AsNoTracking().Include(invoice => invoice.Items).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                var term = searchQuery.Trim().ToLower();
+                query = query.Where(invoice =>
+                    invoice.InvoiceNumber.ToLower().Contains(term) ||
+                    (invoice.SupplierName != null && invoice.SupplierName.ToLower().Contains(term)) ||
+                    (invoice.Notes != null && invoice.Notes.ToLower().Contains(term)));
+            }
+
+            var invoices = await query
+                .OrderByDescending(invoice => invoice.InvoiceDate)
+                .ThenByDescending(invoice => invoice.Id)
+                .ToListAsync();
+            var productIds = invoices.SelectMany(invoice => invoice.Items).Select(item => item.ProductId).Distinct().ToList();
+            var barcodes = await context.Products.AsNoTracking()
+                .Where(product => productIds.Contains(product.Id))
+                .Select(product => new { product.Id, Barcode = product.Barcode ?? string.Empty })
+                .ToDictionaryAsync(product => product.Id, product => product.Barcode);
+
+            return invoices.Select(invoice => new InvoiceExportRecord
+            {
+                InvoiceNumber = invoice.InvoiceNumber,
+                InvoiceDate = invoice.InvoiceDate,
+                PartyName = invoice.SupplierName ?? string.Empty,
+                ItemCount = invoice.Items.Count,
+                Subtotal = invoice.TotalAmount,
+                Total = invoice.TotalAmount,
+                Status = invoice.Status,
+                Items = invoice.Items.Select(item => new InvoiceExportLine
+                {
+                    InvoiceNumber = invoice.InvoiceNumber,
+                    InvoiceDate = invoice.InvoiceDate,
+                    ProductName = item.ProductName,
+                    Barcode = barcodes.GetValueOrDefault(item.ProductId, string.Empty),
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPrice,
+                    LineTotal = item.TotalPrice
+                }).ToList()
+            }).ToList();
+        }
+
         public async Task<PurchaseInvoiceModel?> GetInvoiceByIdAsync(int id)
         {
             try

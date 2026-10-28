@@ -57,7 +57,8 @@ namespace CarPartManager.Services
                     Category = p.Category,
                     Quantity = p.Quantity,
                     MinimumStock = p.MinimumStock,
-                    CostPrice = p.PurchasePrice
+                    CostPrice = p.PurchasePrice,
+                    SellingPrice = p.SellingPrice
                 })
                 .OrderBy(p => p.Name)
                 .ToListAsync();

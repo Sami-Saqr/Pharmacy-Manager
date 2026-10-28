@@ -1,5 +1,17 @@
 ﻿# CarPartManager - Handover Document
 
+## Latest: Excel export Part A — branch `feature-excel-export`
+
+**Status:** Added reusable `.xlsx` export infrastructure and export buttons for Inventory stock overview, Inventory movements, Sales invoice history, and Purchase invoice history. The three history/inventory exports use their current search, stock/status, movement date/product/type filters and include unpaged database results. Products has a separate list/mapping, so its export button is deferred rather than duplicating the inventory mapper.
+
+**Implementation:** Added ClosedXML **0.105.1** (the only new package). `IExcelExportService` and `ExcelExportService` create RTL, styled workbooks with filters, frozen headers, typed cells, subtotals, highlights, print setup, safe text handling, and temp-file replacement. Screen mappers live in `Services/ExcelExportMappers.cs`; invoice history export queries are in the SQLite invoice services; view models expose exporting/empty-data state; shared SaveFileDialog and success/open handling is in `Views/ExcelExportDialog.cs`. To add a screen in Part B, add a mapper/sheet definition, a filtered `AsNoTracking` query if needed, then invoke the shared export service from the screen ViewModel and dialog.
+
+**Files:** Added `Services/ExcelExportDefinition.cs`, `ExcelExportMappers.cs`, `ExcelExportService.cs`, `IExcelExportService.cs`, `InvoiceExportRecord.cs`, `ViewModels/ExcelExportViewModelBase.cs`, `Views/ExcelExportDialog.cs`, and `CarPartManager.Tests/ExcelExportServiceTests.cs`. Updated `CarPartManager.csproj`, inventory/invoice service contracts and implementations, the three export ViewModels, and the Inventory/Sales/Purchase history views and code-behind.
+
+**Validation:** ClosedXML restore succeeded. `dotnet build CarPartManager.csproj --no-restore` succeeded with 0 errors and 8 existing CS8602 warnings in `ViewModels/InventoryViewModel.cs`. The targeted Excel export tests passed (2/2): workbook RTL, headers, typed codes/numbers/dates, injection strings, subtotal formulas, and locked-target preservation. The app was not run and no database files were accessed.
+
+**Remaining/manual checks:** Open stock, movement, sales-history, and purchase-history exports in Excel; check Arabic/RTL layout, currency/date readability, print titles/page footer and filter-aware totals. Compare invoice and stock totals with their screens under searches/filters. Part B exports for Products, Customers, Expenses, and Reports remain out of scope.
+
 ## Latest: Home tile navigation — branch `feature-home-tiles`
 
 **Home tile visual update (2026-10-28):** Filled the three Home tile groups with high-contrast green, blue, and indigo palette brushes; added group-specific darker hover colors, near-white text/icons, and a visible keyboard focus ring. Increased tile titles/descriptions and section heading sizes, emphasized the POS title, and raised tile dimensions/minimums with two-line wrapped descriptions. Home visuals were not runtime-tested; verify tile reflow and text/focus rendering at 1340×820 and the minimum 1040×680.

@@ -10,6 +10,7 @@ namespace CarPartManager.Services
         Task<string> GenerateNextInvoiceNumberAsync();
         Task<string> GenerateInvoiceNumberAsync();
         Task<IEnumerable<PurchaseInvoiceModel>> GetAllInvoicesAsync();
+        Task<IReadOnlyList<InvoiceExportRecord>> GetInvoicesForExportAsync(string? searchQuery);
         Task<PurchaseInvoiceModel?> GetInvoiceByIdAsync(int id);
         Task<PurchaseInvoiceModel> SaveDraftInvoiceAsync(PurchaseInvoiceModel invoice);
         Task<PurchaseInvoiceModel> PostInvoiceAsync(PurchaseInvoiceModel invoice);

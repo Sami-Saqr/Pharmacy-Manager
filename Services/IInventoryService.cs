@@ -45,6 +45,7 @@ namespace CarPartManager.Services
         public int Quantity { get; set; }
         public int MinimumStock { get; set; }
         public decimal CostPrice { get; set; }
+        public decimal SellingPrice { get; set; }
         public decimal StockValue => Quantity * CostPrice;
         public string Status => Quantity <= 0 ? "نفد من المخزن" : Quantity <= MinimumStock ? "منخفض (حرج)" : "متوفر";
         public string StatusColor => Quantity <= 0 ? "#DC2626" : Quantity <= MinimumStock ? "#D97706" : "#059669";

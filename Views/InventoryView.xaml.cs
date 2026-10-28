@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using CarPartManager.ViewModels;
@@ -12,6 +13,28 @@ namespace CarPartManager.Views
         public InventoryView()
         {
             InitializeComponent();
+        }
+
+        private async void ExportStock_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is not InventoryViewModel viewModel || Window.GetWindow(this) is not { } owner)
+            {
+                return;
+            }
+
+            var fileName = $"مخزون_{DateTime.Now:yyyy-MM-dd}.xlsx";
+            await ExcelExportDialog.ExportAsync(owner, fileName, viewModel.ExportStockAsync, () => viewModel.ExportErrorMessage);
+        }
+
+        private async void ExportMovements_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is not InventoryViewModel viewModel || Window.GetWindow(this) is not { } owner)
+            {
+                return;
+            }
+
+            var fileName = $"حركة_المخزون_{DateTime.Now:yyyy-MM-dd}.xlsx";
+            await ExcelExportDialog.ExportAsync(owner, fileName, viewModel.ExportMovementsAsync, () => viewModel.ExportErrorMessage);
         }
 
         /// <summary>

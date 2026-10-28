@@ -11,7 +11,7 @@ namespace CarPartManager.ViewModels
     /// <summary>
     /// نموذج عرض شاشة المخزون والجرد
     /// </summary>
-    public class InventoryViewModel : ViewModelBase
+    public class InventoryViewModel : ExcelExportViewModelBase
     {
         private readonly IInventoryService _inventoryService;
         private readonly IProductService _productService;
@@ -25,6 +25,56 @@ namespace CarPartManager.ViewModels
             set => SetProperty(ref _selectedTabIndex, value);
         }
 
+        protected override void OnExportStateChanged()
+        {
+            base.OnExportStateChanged();
+            OnPropertyChanged(nameof(CanExportStock));
+            OnPropertyChanged(nameof(CanExportMovements));
+            OnPropertyChanged(nameof(StockExportToolTip));
+            OnPropertyChanged(nameof(MovementsExportToolTip));
+        }
+
+        public Task<bool> ExportStockAsync(string destinationPath, string shopName) =>
+            ExportWorkbookAsync(async () =>
+            {
+                var products = await _inventoryService.GetProductStockInfoAsync(StockSearchText, StockFilter);
+                return ExcelExportMappers.InventoryStock(shopName, GetStockFilterDescription(), products);
+            }, destinationPath);
+
+        public Task<bool> ExportMovementsAsync(string destinationPath, string shopName) =>
+            ExportWorkbookAsync(async () =>
+            {
+                var movementType = string.Equals(SelectedMovementType, "الكل", StringComparison.Ordinal)
+                    ? null
+                    : SelectedMovementType;
+                var movements = await _inventoryService.GetMovementsAsync(
+                    MovementFromDate,
+                    MovementToDate,
+                    MovementProductId,
+                    movementType);
+                return ExcelExportMappers.InventoryMovements(shopName, GetMovementFilterDescription(movementType), movements);
+            }, destinationPath);
+
+        private string GetStockFilterDescription()
+        {
+            var search = string.IsNullOrWhiteSpace(StockSearchText) ? "الكل" : StockSearchText.Trim();
+            var status = StockFilter switch
+            {
+                StockFilter.LowStock => "منخفض",
+                StockFilter.OutOfStock => "نفد",
+                _ => "الكل"
+            };
+            return $"البحث: {search} | الحالة: {status}";
+        }
+
+        private string GetMovementFilterDescription(string? movementType)
+        {
+            var from = MovementFromDate?.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture) ?? "البداية";
+            var to = MovementToDate?.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture) ?? "اليوم";
+            var type = string.IsNullOrWhiteSpace(movementType) ? "الكل" : movementType;
+            return $"الفترة: {from} إلى {to} | نوع الحركة: {type} | الصنف: {(MovementProductId?.ToString(CultureInfo.InvariantCulture) ?? "الكل")}";
+        }
+
         // Stock Overview
         private InventorySummary _summary = new();
         public InventorySummary Summary
@@ -34,6 +84,10 @@ namespace CarPartManager.ViewModels
         }
 
         public ObservableCollection<ProductStockInfo> StockProducts { get; } = new();
+        public bool CanExportStock => !IsExporting && StockProducts.Count > 0;
+        public bool CanExportMovements => !IsExporting && Movements.Count > 0;
+        public string StockExportToolTip => CanExportStock ? "تصدير بيانات المخزون الظاهرة" : "لا توجد بيانات للتصدير";
+        public string MovementsExportToolTip => CanExportMovements ? "تصدير حركات المخزون الظاهرة" : "لا توجد بيانات للتصدير";
 
         private ProductStockInfo? _selectedStockProduct;
         public ProductStockInfo? SelectedStockProduct
@@ -197,7 +251,12 @@ namespace CarPartManager.ViewModels
         public RelayCommand RecordAdjustmentCommand { get; }
         public RelayCommand CheckConsistencyCommand { get; }
 
-        public InventoryViewModel(IInventoryService? inventoryService = null, IProductService? productService = null, IStocktakeService? stocktakeService = null)
+        public InventoryViewModel(
+            IInventoryService? inventoryService = null,
+            IProductService? productService = null,
+            IStocktakeService? stocktakeService = null,
+            IExcelExportService? excelExportService = null)
+            : base(excelExportService)
         {
             _inventoryService = inventoryService ?? new SqliteInventoryService();
             _productService = productService ?? new SqliteProductService();
@@ -256,6 +315,8 @@ namespace CarPartManager.ViewModels
                 {
                     StockProducts.Add(p);
                 }
+                OnPropertyChanged(nameof(CanExportStock));
+                OnPropertyChanged(nameof(StockExportToolTip));
             }
             catch (Exception ex)
             {
@@ -284,6 +345,8 @@ namespace CarPartManager.ViewModels
                 {
                     Movements.Add(m);
                 }
+                OnPropertyChanged(nameof(CanExportMovements));
+                OnPropertyChanged(nameof(MovementsExportToolTip));
             }
             catch (Exception ex)
             {

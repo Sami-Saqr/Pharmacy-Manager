@@ -10,7 +10,7 @@ namespace CarPartManager.ViewModels
     /// نموذج عرض صفحة سجل فواتير المشتريات السابقة المستقلة.
     /// يُحمِّل جميع الفواتير من قاعدة البيانات ويدعم البحث والتصفية وعرض التفاصيل.
     /// </summary>
-    public class PurchaseInvoicesHistoryViewModel : ViewModelBase
+    public class PurchaseInvoicesHistoryViewModel : ExcelExportViewModelBase
     {
         private readonly IPurchaseInvoiceService _invoiceService;
         private readonly List<PurchaseInvoiceModel> _allInvoices = new();
@@ -63,8 +63,13 @@ namespace CarPartManager.ViewModels
         // ── الأوامر ─────────────────────────────────────────────────
         public RelayCommand RefreshCommand  { get; }
         public RelayCommand ViewInvoiceCommand { get; }
+        public override bool CanExport => base.CanExport && InvoicesHistory.Count > 0;
+        public override string ExportButtonToolTip => CanExport ? "تصدير سجل المشتريات الظاهر" : "لا توجد بيانات للتصدير";
 
-        public PurchaseInvoicesHistoryViewModel(IPurchaseInvoiceService? invoiceService = null)
+        public PurchaseInvoicesHistoryViewModel(
+            IPurchaseInvoiceService? invoiceService = null,
+            IExcelExportService? excelExportService = null)
+            : base(excelExportService)
         {
             _invoiceService = invoiceService ?? new SqlitePurchaseInvoiceService();
 
@@ -117,6 +122,18 @@ namespace CarPartManager.ViewModels
 
             foreach (var inv in source) InvoicesHistory.Add(inv);
             OnPropertyChanged(nameof(ShowEmptyState));
+            OnPropertyChanged(nameof(CanExport));
+            OnPropertyChanged(nameof(ExportButtonToolTip));
         }
+
+        public Task<bool> ExportAsync(string destinationPath, string shopName) =>
+            ExportWorkbookAsync(async () =>
+            {
+                var invoices = await _invoiceService.GetInvoicesForExportAsync(SearchText);
+                var filters = string.IsNullOrWhiteSpace(SearchText)
+                    ? "المرشح: جميع الفواتير"
+                    : $"البحث: {SearchText.Trim()}";
+                return ExcelExportMappers.PurchaseInvoices(shopName, filters, invoices);
+            }, destinationPath);
     }
 }
