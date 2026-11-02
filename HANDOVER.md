@@ -56,10 +56,10 @@ PharmacyApp/
 
 | الحالة | التفاصيل |
 |---|---|
-| آخر build ناجح | `dotnet build` — 0 errors، 8 warnings (CS8602 في `InventoryViewModel.cs` L218-221، مؤجلة) |
-| الـ Tests | **23/23 ناجحة** (آخر تشغيل على `feature-excel-export`) |
+| آخر build ناجح | `dotnet build` — 0 errors، 8 warnings (CS8602 في `InventoryViewModel.cs` L280-283، مؤجلة) |
+| الـ Tests | **23/23 ناجحة** (على `PharmacyManager.Tests`) |
 | الـ Tests project | `PharmacyManager.Tests/` — xUnit، in-memory SQLite |
-| التطبيق | لم يُشغَّل بعد مرحلة 0b. **يجب التحقق يدوياً** من فتح التطبيق وDbInitializer على الداتابيز الجديدة. |
+| التطبيق | لم يُشغَّل الـ GUI تفاعلياً (بيئة CLI headless لا تدعم واجهة مرئية، يلزم تشغيله يدوياً للتحقق). |
 
 ---
 
@@ -77,7 +77,7 @@ PharmacyApp/
 - بيانات seed في `DbInitializer.cs` (موردين + أصناف خاصة بقطع غيار) — تُستبدل في 1A
 - `Services/MockProductService.cs` — بيانات mock خاصة بالسيارات
 - `ViewModels/MainViewModel.cs` L37: StoreName placeholder خاص بقطع الغيار (يُستبدل بـ Settings في مرحلة 2)
-- CS8602 warnings في `InventoryViewModel.cs` L218-221 — مؤجلة
+- CS8602 warnings في `InventoryViewModel.cs` L280-283 — مؤجلة
 - Products Excel export — مؤجل
 
 ---
@@ -99,10 +99,10 @@ PharmacyApp/
 
 ## 7. سجل التحديثات
 
-### 2026-11-02 Phase 0 — تلخيص الـ handover وإعادة التسمية
-- اللي اتعمل: تلخيص HANDOVER.md، نقل التفاصيل لـ HANDOVER_ARCHIVE.md، rename كامل CarPartManager→PharmacyManager
-- ملفات اتغيرت: csproj، DbContext، كل namespaces، App.xaml، MainWindow.xaml، نصوص UI، مسار الداتابيز
-- Schema changes: لا شيء (أسماء الجداول والأعمدة لم تتغير)
-- Build/Tests: ناجح 0 errors، 23/23 tests
-- Open issues: حقول CarPart-specific مدرجة في القسم 5 أعلاه (Phase 1A)
-- الخطوة الجاية: Phase 1A — drug fields + Settings + إصلاح bug الجرد
+### 2026-11-02 Phase 0 — استكمال وإصلاح الـ rename وهيكل الاختبارات
+- اللي اتعمل: توحيد فولدر التست لـ PharmacyManager.Tests بـ git mv، واستثناؤه من csproj الرئيسي، وتحديث DbContext ومؤلف الإكسيل
+- ملفات/جداول اتغيرت: PharmacyManager.csproj, PharmacyManager.Tests, PharmacyDbContext.cs, ExcelExportService.cs
+- Schema changes: لا شيء (ممنوع في المرحلة 0)
+- Build/Tests: ناجح 0 errors (8 warnings سابقة CS8602)، واختبارات xUnit ناجحة 23/23
+- Open issues: حقول الأدوية وبج الجرد مؤجلة لـ 1A؛ لم يُشغَّل GUI لبيئة headless
+- الخطوة الجاية: Phase 1A — حقول الدواء والـ Settings وإصلاح الجرد
