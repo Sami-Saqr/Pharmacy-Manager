@@ -1,6 +1,6 @@
-using System.Windows.Media;
+﻿using System.Windows.Media;
 
-namespace CarPartManager.Models
+namespace PharmacyManager.Models
 {
     public sealed class HomeTile
     {

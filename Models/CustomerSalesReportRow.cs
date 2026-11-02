@@ -1,4 +1,4 @@
-namespace CarPartManager.Models
+﻿namespace PharmacyManager.Models
 {
     /// <summary>
     /// مبيعات عميل واحد خلال الفترة (العملاء النقديون يُجمعون تحت "عميل نقدي").

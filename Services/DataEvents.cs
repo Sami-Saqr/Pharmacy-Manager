@@ -1,4 +1,4 @@
-namespace CarPartManager.Services
+﻿namespace PharmacyManager.Services
 {
     /// <summary>
     /// وسيط أحداث النظام لإشعار الشاشات المختلفة بحدوث تغييرات في قاعدة البيانات

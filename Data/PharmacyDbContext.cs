@@ -1,14 +1,14 @@
 using System.IO;
 using Microsoft.EntityFrameworkCore;
-using CarPartManager.Models;
+using PharmacyManager.Models;
 
-namespace CarPartManager.Data
+namespace PharmacyManager.Data
 {
     /// <summary>
     /// سياق قاعدة البيانات المحلي (Entity Framework Core DbContext).
     /// يدير الاتصال بقاعدة بيانات SQLite وجداول الأصناف، الموردين، فواتير المشتريات، وحركات المخزون.
     /// </summary>
-    public class CarPartsDbContext : DbContext
+    public class PharmacyDbContext : DbContext
     {
         public DbSet<ProductModel> Products => Set<ProductModel>();
         public DbSet<SupplierModel> Suppliers => Set<SupplierModel>();
@@ -43,7 +43,7 @@ namespace CarPartManager.Data
         {
             var folder = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "CarPartManager"
+                "PharmacyManager"
             );
 
             if (!Directory.Exists(folder))
@@ -51,14 +51,14 @@ namespace CarPartManager.Data
                 Directory.CreateDirectory(folder);
             }
 
-            return Path.Combine(folder, "carparts.db");
+            return Path.Combine(folder, "pharmacy.db");
         }
 
-        public CarPartsDbContext()
+        public PharmacyDbContext()
         {
         }
 
-        public CarPartsDbContext(DbContextOptions<CarPartsDbContext> options) : base(options)
+        public PharmacyDbContext(DbContextOptions<PharmacyDbContext> options) : base(options)
         {
         }
 

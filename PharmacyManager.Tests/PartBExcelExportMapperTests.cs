@@ -1,10 +1,10 @@
 using System.IO;
-using CarPartManager.Models;
-using CarPartManager.Services;
+using PharmacyManager.Models;
+using PharmacyManager.Services;
 using ClosedXML.Excel;
 using Xunit;
 
-namespace CarPartManager.Tests;
+namespace PharmacyManager.Tests;
 
 public sealed class PartBExcelExportMapperTests
 {
@@ -215,7 +215,7 @@ public sealed class PartBExcelExportMapperTests
 
     private static async Task<XLWorkbook> ExportAndOpenAsync(ExcelExportWorkbook definition)
     {
-        var path = Path.Combine(Path.GetTempPath(), $"CarPartManager.PartB.{Guid.NewGuid():N}.xlsx");
+        var path = Path.Combine(Path.GetTempPath(), $"PharmacyManager.PartB.{Guid.NewGuid():N}.xlsx");
         try
         {
             await new ExcelExportService().ExportAsync(definition, path);

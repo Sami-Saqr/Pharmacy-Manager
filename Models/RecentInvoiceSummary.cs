@@ -1,4 +1,4 @@
-namespace CarPartManager.Models
+﻿namespace PharmacyManager.Models
 {
     /// <summary>
     /// نموذج بيانات مختصر لآخر الفواتير والعمليات اليومية

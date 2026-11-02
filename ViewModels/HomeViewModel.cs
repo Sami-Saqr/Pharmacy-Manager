@@ -1,9 +1,9 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows.Media;
-using CarPartManager.Models;
-using CarPartManager.MVVM;
+using PharmacyManager.Models;
+using PharmacyManager.MVVM;
 
-namespace CarPartManager.ViewModels
+namespace PharmacyManager.ViewModels
 {
     public sealed class HomeViewModel : ViewModelBase
     {

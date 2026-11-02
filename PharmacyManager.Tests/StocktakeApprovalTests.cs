@@ -1,11 +1,11 @@
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using CarPartManager.Data;
-using CarPartManager.Models;
-using CarPartManager.Services;
+using PharmacyManager.Data;
+using PharmacyManager.Models;
+using PharmacyManager.Services;
 using Xunit;
 
-namespace CarPartManager.Tests;
+namespace PharmacyManager.Tests;
 
 /// <summary>
 /// اختبارات منطق اعتماد الجرد باستخدام SQLite في الذاكرة (مزود علائقي حقيقي وليس EF InMemory)،
@@ -17,29 +17,29 @@ public sealed class StocktakeApprovalTests
     private sealed class TestDb : IDisposable
     {
         public SqliteConnection Connection { get; }
-        public DbContextOptions<CarPartsDbContext> Options { get; }
+        public DbContextOptions<PharmacyDbContext> Options { get; }
 
         public TestDb()
         {
             Connection = new SqliteConnection("DataSource=:memory:");
             Connection.Open();
-            Options = new DbContextOptionsBuilder<CarPartsDbContext>()
+            Options = new DbContextOptionsBuilder<PharmacyDbContext>()
                 .UseSqlite(Connection)
                 .Options;
-            using var ctx = new CarPartsDbContext(Options);
+            using var ctx = new PharmacyDbContext(Options);
             ctx.Database.EnsureCreated();
         }
 
-        public CarPartsDbContext NewContext() => new CarPartsDbContext(Options);
+        public PharmacyDbContext NewContext() => new PharmacyDbContext(Options);
         public void Dispose() => Connection.Dispose();
     }
 
     /// <summary>نسخة من الخدمة توجّه السياق إلى اتصال SQLite في الذاكرة المشترك.</summary>
     private sealed class TestableStocktakeService : SqliteStocktakeService
     {
-        private readonly DbContextOptions<CarPartsDbContext> _options;
-        public TestableStocktakeService(DbContextOptions<CarPartsDbContext> options) => _options = options;
-        protected override CarPartsDbContext CreateContext() => new CarPartsDbContext(_options);
+        private readonly DbContextOptions<PharmacyDbContext> _options;
+        public TestableStocktakeService(DbContextOptions<PharmacyDbContext> options) => _options = options;
+        protected override PharmacyDbContext CreateContext() => new PharmacyDbContext(_options);
     }
 
     private static ProductModel SeedProduct(TestDb db, string partNumber, int qty, decimal cost = 10m, string barcode = "B")

@@ -1,4 +1,4 @@
-namespace CarPartManager.Models
+﻿namespace PharmacyManager.Models
 {
     /// <summary>
     /// صف واحد في تقرير المبيعات اليومي.

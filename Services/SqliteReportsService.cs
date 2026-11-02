@@ -1,8 +1,8 @@
-using CarPartManager.Data;
-using CarPartManager.Models;
+﻿using PharmacyManager.Data;
+using PharmacyManager.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     /// <summary>
     /// تنفيذ تقارير التقارير المحاسبية على SQLite — للقراءة فقط (AsNoTracking) ولا يُعدّل أي بيانات.
@@ -26,7 +26,7 @@ namespace CarPartManager.Services
         private const string UnknownSupplier = "مورد غير معروف";
 
         // قابل للتجاوز في الاختبارات (SQLite في الذاكرة) بنفس نمط بقية الخدمات.
-        protected virtual CarPartsDbContext CreateContext() => new CarPartsDbContext();
+        protected virtual PharmacyDbContext CreateContext() => new PharmacyDbContext();
 
         // ── ملخص الأرباح ──────────────────────────────────────────────────────
 
@@ -161,7 +161,7 @@ namespace CarPartManager.Services
             };
         }
 
-        private static async Task<Dictionary<int, decimal>> GetCostPricesAsync(CarPartsDbContext context, List<int> productIds)
+        private static async Task<Dictionary<int, decimal>> GetCostPricesAsync(PharmacyDbContext context, List<int> productIds)
         {
             if (productIds.Count == 0) return new Dictionary<int, decimal>();
 
@@ -173,7 +173,7 @@ namespace CarPartManager.Services
             return rows.ToDictionary(p => p.Id, p => p.PurchasePrice);
         }
 
-        private static async Task<decimal> GetActiveExpensesTotalAsync(CarPartsDbContext context, DateTime from, DateTime to)
+        private static async Task<decimal> GetActiveExpensesTotalAsync(PharmacyDbContext context, DateTime from, DateTime to)
         {
             var amounts = await context.Expenses.AsNoTracking()
                 .Where(e => !e.IsCancelled && e.ExpenseDate >= from && e.ExpenseDate < to)

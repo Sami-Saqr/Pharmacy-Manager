@@ -1,6 +1,6 @@
-using CarPartManager.Models;
+﻿using PharmacyManager.Models;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     /// <summary>
     /// كائن نقل بيانات مؤشرات وإحصائيات لوحة التحكم المحسوبة من SQLite

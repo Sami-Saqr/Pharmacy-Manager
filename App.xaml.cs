@@ -1,12 +1,12 @@
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using Microsoft.EntityFrameworkCore;
-using CarPartManager.Data;
-using CarPartManager.Models;
-using CarPartManager.Services;
-using CarPartManager.ViewModels;
+using PharmacyManager.Data;
+using PharmacyManager.Models;
+using PharmacyManager.Services;
+using PharmacyManager.ViewModels;
 
-namespace CarPartManager
+namespace PharmacyManager
 {
     /// <summary>
     /// Interaction logic for App.xaml
@@ -20,7 +20,7 @@ namespace CarPartManager
             // تهيئة قاعدة البيانات المحلية SQLite بشكل آمن عند بدء التطبيق
             try
             {
-                using var db = new CarPartsDbContext();
+                using var db = new PharmacyDbContext();
                 await DbInitializer.InitializeAsync(db);
             }
             catch (Exception ex)
@@ -69,7 +69,7 @@ namespace CarPartManager
             }
 
             // 1. التحقق من مسار ملف قاعدة البيانات
-            var dbPath = CarPartsDbContext.GetDatabaseFilePath();
+            var dbPath = PharmacyDbContext.GetDatabaseFilePath();
             Assert(!string.IsNullOrWhiteSpace(dbPath) && File.Exists(dbPath), $"وجود ملف قاعدة البيانات المحلية في المسار الآمن: {dbPath}");
 
             // 2. اختبار خدمة قاعدة البيانات الحقيقية SqliteProductService
@@ -256,7 +256,7 @@ namespace CarPartManager
                 $"تحديث المخزون التلقائي: زاد رصيد الصنف من {stockBeforeDraft} إلى {expectedStockAfterPost} (+5 قطع واردة)");
 
             // التحقق من إنشاء سجل حركة المخزون (InventoryMovement Audit Log)
-            using (var auditDb = new CarPartsDbContext())
+            using (var auditDb = new PharmacyDbContext())
             {
                 var movement = auditDb.InventoryMovements
                     .FirstOrDefault(m => m.ReferenceId == postedInvoice.Id && m.ProductId == targetProduct.Id && m.MovementType == "شراء وارد");
@@ -318,7 +318,7 @@ namespace CarPartManager
 
             // فحص تطابق النواقص مع قاعدة البيانات
             int actualLowStockInDb;
-            using (var checkDb = new CarPartsDbContext())
+            using (var checkDb = new PharmacyDbContext())
             {
                 actualLowStockInDb = checkDb.Products.Count(p => p.Quantity <= p.MinimumStock);
             }
@@ -454,7 +454,7 @@ namespace CarPartManager
                 $"خصم المخزون للصنف الثاني: نقص الرصيد من {stockP2Before} إلى {p2AfterPost?.Quantity} (-{qtyToSellP2} قطعة)");
 
             // 22. التحقق من توثيق حركات المخزون بنوع 'بيع صادر' والرصيد السالب
-            using (var auditDb = new CarPartsDbContext())
+            using (var auditDb = new PharmacyDbContext())
             {
                 var mov1 = auditDb.InventoryMovements
                     .FirstOrDefault(m => m.ReferenceId == postedSalesInvoice.Id && m.ProductId == testProduct1.Id && m.MovementType == "بيع صادر");
@@ -920,7 +920,7 @@ namespace CarPartManager
 
             var cancelSuccess = purchaseInvoiceService.CancelInvoiceAsync(cancelTestPurchase.Id, "إلغاء تجريبي مع توفر الرصيد").GetAwaiter().GetResult();
             int stockAfterCancel = sqliteService.GetByIdAsync(returnTestProduct.Id).GetAwaiter().GetResult()!.Quantity;
-            using (var dbCheck = new CarPartsDbContext())
+            using (var dbCheck = new PharmacyDbContext())
             {
                 var cancelledDbInv = dbCheck.PurchaseInvoices.Find(cancelTestPurchase.Id);
                 Assert(cancelSuccess && cancelledDbInv!.Status == "ملغاة" && stockAfterCancel == 47,
@@ -991,7 +991,7 @@ namespace CarPartManager
             Assert(cancelWithReturnsRejected, "رفض إلغاء فاتورة مبيعات مسجل عليها مرتجعات معتمدة حماية لسلامة الحسابات");
 
             // الحالة 10: التأكد من صحة المخزون بعد إغلاق البرنامج وإعادة تشغيله (قراءة من قرص SQLite)
-            using (var freshContext = new CarPartsDbContext())
+            using (var freshContext = new PharmacyDbContext())
             {
                 var diskProduct = freshContext.Products.AsNoTracking().FirstOrDefault(p => p.Id == returnTestProduct.Id);
                 Assert(diskProduct != null && diskProduct.Quantity == 2,
@@ -1007,7 +1007,7 @@ namespace CarPartManager
 
             // الحالة 12: التأكد من عدم حدوث تغييرات جزئية عند فشل المعاملة (Atomicity / Rollback)
             int movementsBeforeFail;
-            using (var countContext = new CarPartsDbContext())
+            using (var countContext = new PharmacyDbContext())
             {
                 movementsBeforeFail = countContext.InventoryMovements.Count();
             }
@@ -1034,7 +1034,7 @@ namespace CarPartManager
                 // خطأ متوقع
             }
             int movementsAfterFail;
-            using (var countContext = new CarPartsDbContext())
+            using (var countContext = new PharmacyDbContext())
             {
                 movementsAfterFail = countContext.InventoryMovements.Count();
             }
@@ -1193,7 +1193,7 @@ namespace CarPartManager
                 "خيار 3 (نجاح): استبعاد القطع نهائياً دون زيادتها للمخزون الصالح أو مخزون التالف");
 
             // التحقق من تسجيل الحركة التاريخية للاستبعاد النهائي
-            using (var auditDb = new CarPartsDbContext())
+            using (var auditDb = new PharmacyDbContext())
             {
                 var disposalMovement = auditDb.InventoryMovements
                     .FirstOrDefault(m => m.ReferenceNumber == returnDisposal.ReturnNumber && m.MovementType.Contains("استبعاد"));
@@ -1472,7 +1472,7 @@ namespace CarPartManager
             sqliteService.UpdateProductAsync(testProduct2).GetAwaiter().GetResult();
 
             // تنظيف أصناف وفواتير الاختبار المنشأة
-            using (var cleanupDb = new CarPartsDbContext())
+            using (var cleanupDb = new PharmacyDbContext())
             {
                 var testInv = cleanupDb.SalesInvoices.Include(s => s.Items).FirstOrDefault(s => s.Id == postedSalesInvoice.Id);
                 if (testInv != null) cleanupDb.SalesInvoices.Remove(testInv);
@@ -1581,7 +1581,7 @@ namespace CarPartManager
             // فاتورة: إجمالي 1200 ج.م، مدفوع منها 200 ج.م -> المتبقي 1000 ج.م
             // الرصيد المتوقع = 500 (افتتاحي) + 1000 (متبقي من الفاتورة) = 1500 ج.م
             int testInvoiceId = 0;
-            using (var dbInv = new CarPartsDbContext())
+            using (var dbInv = new PharmacyDbContext())
             {
                 var invEntity = new SalesInvoiceModel
                 {
@@ -1642,7 +1642,7 @@ namespace CarPartManager
             Assert(cancelPaymentSuccess, "إلغاء الدفعة المسجلة بالخطأ دون حذف سجلها المالي");
 
             // التحقق من أن السجل المالي لا يزال موجوداً وحالته ملغاة
-            using (var dbCheck = new CarPartsDbContext())
+            using (var dbCheck = new PharmacyDbContext())
             {
                 var payInDb = dbCheck.CustomerPayments.FirstOrDefault(p => p.Id == savedPay2.Id);
                 Assert(payInDb != null && payInDb.IsCancelled && payInDb.CancellationReason == "تسجيل بالخطأ من الكاشير",
@@ -1676,7 +1676,7 @@ namespace CarPartManager
             Assert(finalLine.RunningBalance == 900.00m, $"الرصيد التراكمي الختامي لكشف الحساب يطابق رصيد العميل تماماً: {finalLine.RunningBalance:N2} ج.م");
 
             // تنظيف بيانات الاختبار الخاصة بالعميل
-            using (var cleanupDb = new CarPartsDbContext())
+            using (var cleanupDb = new PharmacyDbContext())
             {
                 var paymentsToDelete = cleanupDb.CustomerPayments.Where(p => p.CustomerId == addedCust.Id).ToList();
                 cleanupDb.CustomerPayments.RemoveRange(paymentsToDelete);
@@ -1767,7 +1767,7 @@ namespace CarPartManager
                 "منع تكرار رقم الهاتف الموحد وإظهار رسالة عربية تذكر اسم العميل الحالي 'محمد أحمد'");
 
             // تنظيف بيانات الاختبار الخاصة بنموذج العملاء
-            using (var cleanupDb = new CarPartsDbContext())
+            using (var cleanupDb = new PharmacyDbContext())
             {
                 var custsToDelete = cleanupDb.Customers
                     .Where(c => c.Name == "عميل تجريبي للاختبار" || c.Name == "عميل أرقام مشرقية" || c.Name == "محمد أحمد" || c.Name == "علي محمود")
@@ -1918,7 +1918,7 @@ namespace CarPartManager
                 "استرجاع اقتراحات العملاء الحية المطابقة للاسم في الكاشير بنجاح");
 
             // تنظيف بيانات اختبار الكاشير
-            using (var cleanupDb = new CarPartsDbContext())
+            using (var cleanupDb = new PharmacyDbContext())
             {
                 var invoicesToDelete = cleanupDb.SalesInvoices
                     .Where(i => i.InvoiceNumber.StartsWith("POS-TEST-"))

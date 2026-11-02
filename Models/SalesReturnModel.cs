@@ -1,7 +1,7 @@
-using System.Collections.ObjectModel;
-using CarPartManager.MVVM;
+﻿using System.Collections.ObjectModel;
+using PharmacyManager.MVVM;
 
-namespace CarPartManager.Models
+namespace PharmacyManager.Models
 {
     /// <summary>
     /// يمثل إشعار / فاتورة مرتجع مبيعات من العميل (Sales Return Model)

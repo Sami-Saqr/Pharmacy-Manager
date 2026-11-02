@@ -1,6 +1,6 @@
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
-namespace CarPartManager.Views
+namespace PharmacyManager.Views
 {
     /// <summary>
     /// Interaction logic for ProductsView.xaml

@@ -1,6 +1,6 @@
-using CarPartManager.Models;
+﻿using PharmacyManager.Models;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     /// <summary>
     /// خدمة بيانات تجريبية (Mock Product Service) تحاكي قاعدة البيانات في الذاكرة.

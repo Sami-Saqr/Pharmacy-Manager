@@ -7,6 +7,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <AssemblyName>PharmacyManager.Tests</AssemblyName>
+    <RootNamespace>PharmacyManager.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CarPartManager.csproj" />
+    <ProjectReference Include="..\PharmacyManager.csproj" />
   </ItemGroup>
 
 </Project>

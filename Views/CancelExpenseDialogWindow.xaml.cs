@@ -1,7 +1,7 @@
-using System.Windows;
-using CarPartManager.ViewModels;
+﻿using System.Windows;
+using PharmacyManager.ViewModels;
 
-namespace CarPartManager.Views
+namespace PharmacyManager.Views
 {
     /// <summary>
     /// نافذة تأكيد إلغاء مصروف مع سبب إجباري (Interaction logic for CancelExpenseDialogWindow.xaml)

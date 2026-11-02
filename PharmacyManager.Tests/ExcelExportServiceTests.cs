@@ -1,9 +1,9 @@
 using System.IO;
-using CarPartManager.Services;
+using PharmacyManager.Services;
 using ClosedXML.Excel;
 using Xunit;
 
-namespace CarPartManager.Tests;
+namespace PharmacyManager.Tests;
 
 public sealed class ExcelExportServiceTests
 {
@@ -133,7 +133,7 @@ public sealed class ExcelExportServiceTests
 
     private static string CreateTemporaryDirectory()
     {
-        var directory = Path.Combine(Path.GetTempPath(), $"CarPartManager.ExcelTests.{Guid.NewGuid():N}");
+        var directory = Path.Combine(Path.GetTempPath(), $"PharmacyManager.ExcelTests.{Guid.NewGuid():N}");
         Directory.CreateDirectory(directory);
         return directory;
     }

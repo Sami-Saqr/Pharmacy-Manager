@@ -1,6 +1,6 @@
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
-namespace CarPartManager.Views
+namespace PharmacyManager.Views
 {
     public partial class HomeView : UserControl
     {

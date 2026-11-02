@@ -1,16 +1,16 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.EntityFrameworkCore;
-using CarPartManager.Data;
-using CarPartManager.Models;
-using CarPartManager.MVVM;
-using CarPartManager.Services;
+using PharmacyManager.Data;
+using PharmacyManager.Models;
+using PharmacyManager.MVVM;
+using PharmacyManager.Services;
 
-namespace CarPartManager.ViewModels
+namespace PharmacyManager.ViewModels
 {
     /// <summary>
     /// صنف وسيط لعرض بنود فاتورة المبيعات وتحديد الكمية المرتجعة وحالة القطعة
@@ -457,7 +457,7 @@ namespace CarPartManager.ViewModels
             var returnedQuantities = await _returnsService.GetPurchaseInvoiceReturnedQuantitiesAsync(invoice.Id);
 
             // جلب الأرصدة الحالية في المخزون
-            using var context = new CarPartsDbContext();
+            using var context = new PharmacyDbContext();
             var productIds = invoice.Items.Select(i => i.ProductId).Distinct().ToList();
             var stockMap = await context.Products
                                         .Where(p => productIds.Contains(p.Id))

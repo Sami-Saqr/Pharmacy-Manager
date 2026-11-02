@@ -1,4 +1,4 @@
-namespace CarPartManager.Models
+﻿namespace PharmacyManager.Models
 {
     /// <summary>
     /// صف في تقرير أفضل الأصناف (بالكمية أو بالقيمة).

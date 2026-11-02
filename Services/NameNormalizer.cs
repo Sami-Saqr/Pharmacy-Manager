@@ -1,6 +1,6 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     /// <summary>
     /// مساعد توحيد الأسماء النصية (Name Normalization Helper).

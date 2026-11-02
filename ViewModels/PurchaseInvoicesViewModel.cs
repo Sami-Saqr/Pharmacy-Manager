@@ -1,10 +1,10 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
-using CarPartManager.Models;
-using CarPartManager.MVVM;
-using CarPartManager.Services;
+using PharmacyManager.Models;
+using PharmacyManager.MVVM;
+using PharmacyManager.Services;
 
-namespace CarPartManager.ViewModels
+namespace PharmacyManager.ViewModels
 {
     /// <summary>
     /// نموذج عرض شاشة فواتير المشتريات وإدارة حركات التوريد للمخزون
@@ -445,7 +445,7 @@ namespace CarPartManager.ViewModels
                 StatusMessage = $"تم اعتماد الفاتورة '{posted.InvoiceNumber}' بنجاح وزيادة كميات المخزون في المستودع.";
 
                 MessageBox.Show(
-                    $"تم اعتماد فاتورة المشتريات رقم ({posted.InvoiceNumber}) بنجاح!\nتم تحديث أرصدة قطع الغيار في المخزن تلقائياً.",
+                    $"تم اعتماد فاتورة المشتريات رقم ({posted.InvoiceNumber}) بنجاح!\nتم تحديث أرصدة المخزون تلقائياً.",
                     "تم الاعتماد بنجاح",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);

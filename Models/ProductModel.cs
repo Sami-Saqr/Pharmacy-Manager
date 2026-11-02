@@ -1,6 +1,6 @@
-using CarPartManager.MVVM;
+﻿using PharmacyManager.MVVM;
 
-namespace CarPartManager.Models
+namespace PharmacyManager.Models
 {
     /// <summary>
     /// نموذج بيانات قطعة الغيار (Product / Spare Part Model).

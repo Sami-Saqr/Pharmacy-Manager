@@ -1,7 +1,7 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     /// <summary>
     /// فئة مساعدة موحدة لتوحيد وتدقيق أرقام الهواتف (Phone Normalization Helper).

@@ -1,4 +1,4 @@
-namespace CarPartManager.Models
+﻿namespace PharmacyManager.Models
 {
     /// <summary>صف صنف في تقييم المخزون (الحالة الحالية)</summary>
     public class InventoryValuationRow

@@ -1,14 +1,14 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
-using CarPartManager.Models;
-using CarPartManager.MVVM;
-using CarPartManager.Services;
-using CarPartManager.Views;
+using PharmacyManager.Models;
+using PharmacyManager.MVVM;
+using PharmacyManager.Services;
+using PharmacyManager.Views;
 
-namespace CarPartManager.ViewModels
+namespace PharmacyManager.ViewModels
 {
     /// <summary>
-    /// نموذج عرض شاشة الأصناف وقطع الغيار (Products ViewModel).
+    /// نموذج عرض شاشة الأصناف والمنتجات (Products ViewModel).
     /// يدير عرض جدول القطع، التصفية والبحث الحي، وإضافة وتعديل وحذف الأصناف.
     /// </summary>
     public class ProductsViewModel : ViewModelBase
@@ -96,7 +96,7 @@ namespace CarPartManager.ViewModels
         }
 
         /// <summary>
-        /// تحميل قائمة قطع الغيار من الخدمة وحساب المؤشرات
+        /// تحميل قائمة الأصناف من الخدمة وحساب المؤشرات
         /// </summary>
         public async Task LoadProductsAsync()
         {

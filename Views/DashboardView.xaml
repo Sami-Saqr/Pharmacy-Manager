@@ -1,9 +1,9 @@
-<UserControl x:Class="CarPartManager.Views.DashboardView"
+﻿<UserControl x:Class="PharmacyManager.Views.DashboardView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:viewmodels="clr-namespace:CarPartManager.ViewModels"
+             xmlns:viewmodels="clr-namespace:PharmacyManager.ViewModels"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance Type=viewmodels:DashboardViewModel}"
              d:DesignHeight="750" d:DesignWidth="1100"
@@ -24,7 +24,7 @@
                                FontSize="22" 
                                FontWeight="Bold" 
                                Foreground="{StaticResource TextPrimaryBrush}" />
-                    <TextBlock Text="متابعة حركة المشتريات والتوريد اليومية، فواتير الموردين، وتنبيهات نواقص قطع الغيار في المستودع" 
+                    <TextBlock Text="متابعة حركة المشتريات والتوريد اليومية، فواتير الموردين، وتنبيهات نواقص الأصناف في المخزون" 
                                FontSize="13" 
                                Foreground="{StaticResource TextSecondaryBrush}" 
                                Margin="0,4,0,0" />
@@ -116,7 +116,7 @@
                     </Grid>
                 </Border>
 
-                <!-- بطاقة 3: إجمالي الأصناف وقطع الغيار -->
+                <!-- بطاقة 3: إجمالي الأصناف -->
                 <Border Grid.Column="4" Style="{StaticResource MetricCardStyle}">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -126,7 +126,7 @@
                         </Grid.RowDefinitions>
 
                         <Grid Grid.Row="0">
-                            <TextBlock Text="أصناف قطع الغيار المسجلة" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBlock Text="الأصناف المسجلة" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" />
                             <Border HorizontalAlignment="Right" Background="{StaticResource ProductsTealLightBrush}" CornerRadius="6" Width="36" Height="36">
                                 <Path Data="M20 7l-8-4-8 4 8 4 8-4zm-8 6l-8-4v8l8 4 8-4v-8l-8 4z"
                                       Fill="{StaticResource ProductsTealBrush}" Width="18" Height="18" Stretch="Uniform" />
@@ -171,12 +171,12 @@
                     <ColumnDefinition Width="1.7*" />
                 </Grid.ColumnDefinitions>
 
-                <!-- الجزء الأيمن: جدول قطع الغيار التي أوشكت على النفاد -->
+                <!-- الجزء الأيمن: جدول الأصناف التي أوشكت على النفاد -->
                 <Border Grid.Column="0" Style="{StaticResource ContentPanelCardStyle}">
                     <StackPanel>
                         <Grid Margin="0,0,0,16">
                             <StackPanel>
-                                <TextBlock Text="قطع الغيار الواجب إعادة طلبها (النواقص الحرجة)" 
+                                <TextBlock Text="الأصناف الواجب إعادة طلبها (النواقص الحرجة)" 
                                            FontSize="16" 
                                            FontWeight="Bold" 
                                            Foreground="{StaticResource TextPrimaryBrush}" />
@@ -207,7 +207,7 @@
                                 <!-- اسم القطعة -->
                                 <DataGridTextColumn Header="اسم الصنف" Binding="{Binding PartName}" Width="*" FontWeight="SemiBold" />
 
-                                <!-- التوافق مع السيارات -->
+                                <!-- حقل إضافي -->
                                 <DataGridTextColumn Header="السيارات المتوافقة" Binding="{Binding VehicleModel}" Width="160" Foreground="{StaticResource TextSecondaryBrush}" />
 
                                 <!-- الكمية الحالية -->
@@ -301,7 +301,7 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- صندوق أدوات سريعة لمحل قطع الغيار -->
+                    <!-- أدوات سريعة -->
                     <Border Style="{StaticResource ContentPanelCardStyle}">
                         <StackPanel>
                             <TextBlock Text="معلومات المستودع والفرع" 

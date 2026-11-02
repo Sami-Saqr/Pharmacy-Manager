@@ -1,4 +1,4 @@
-namespace CarPartManager.Models
+﻿namespace PharmacyManager.Models
 {
     /// <summary>
     /// نموذج بيانات لقطعة الغيار ذات المخزون المنخفض التي تتطلب إعادة طلب

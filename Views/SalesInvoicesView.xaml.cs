@@ -1,9 +1,9 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using CarPartManager.ViewModels;
+using PharmacyManager.ViewModels;
 
-namespace CarPartManager.Views
+namespace PharmacyManager.Views
 {
     /// <summary>
     /// كود شاشة نقطة البيع (الكاشير) مع إدارة قارئ الباركود والتركيز التلقائي

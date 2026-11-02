@@ -1,6 +1,6 @@
-using CarPartManager.MVVM;
+﻿using PharmacyManager.MVVM;
 
-namespace CarPartManager.Models
+namespace PharmacyManager.Models
 {
     /// <summary>
     /// سجل تدقيق مبسط لتعديلات وإلغاءات المصروفات (Expense History / Audit Model).

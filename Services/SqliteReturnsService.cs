@@ -1,19 +1,19 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using CarPartManager.Data;
-using CarPartManager.Models;
+using PharmacyManager.Data;
+using PharmacyManager.Models;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     /// <summary>
     /// خدمة معالجة مرتجعات المبيعات والمشتريات وتحديث المخزون بحركات ذرية آمنة
     /// </summary>
     public class SqliteReturnsService : IReturnsService
     {
-        private CarPartsDbContext CreateContext() => new CarPartsDbContext();
+        private PharmacyDbContext CreateContext() => new PharmacyDbContext();
 
         /// <summary>
         /// توليد رقم مرتجع مبيعات تسلسلي فريد (مثل SRT-2026-0001)

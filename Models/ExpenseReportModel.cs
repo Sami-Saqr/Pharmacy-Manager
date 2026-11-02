@@ -1,4 +1,4 @@
-namespace CarPartManager.Models
+﻿namespace PharmacyManager.Models
 {
     /// <summary>
     /// إجمالي مصروفات تصنيف واحد خلال الفترة.

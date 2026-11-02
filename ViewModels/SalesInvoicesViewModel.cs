@@ -1,12 +1,12 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
-using CarPartManager.Models;
-using CarPartManager.MVVM;
-using CarPartManager.Services;
+using PharmacyManager.Models;
+using PharmacyManager.MVVM;
+using PharmacyManager.Services;
 
-namespace CarPartManager.ViewModels
+namespace PharmacyManager.ViewModels
 {
     /// <summary>
     /// نموذج عرض شاشة فواتير المبيعات ونقاط البيع وإدارة حركات الصرف والخصم من المخزون

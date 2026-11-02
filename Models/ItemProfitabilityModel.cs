@@ -1,4 +1,4 @@
-namespace CarPartManager.Models
+﻿namespace PharmacyManager.Models
 {
     /// <summary>صف صنف في تقرير ربحية الأصناف</summary>
     public class ItemProfitabilityRow

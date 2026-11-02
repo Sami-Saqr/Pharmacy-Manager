@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CarPartManager.Models;
+using PharmacyManager.Models;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     public interface IReturnsService
     {

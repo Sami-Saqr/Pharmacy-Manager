@@ -1,15 +1,15 @@
-using Microsoft.EntityFrameworkCore;
-using CarPartManager.Data;
-using CarPartManager.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using PharmacyManager.Data;
+using PharmacyManager.Models;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     /// <summary>
     /// خدمة إدارة فواتير المشتريات المعتمدة على SQLite وتحديث المخزون داخل معاملات ذرية (Transactions).
     /// </summary>
     public class SqlitePurchaseInvoiceService : IPurchaseInvoiceService
     {
-        private CarPartsDbContext CreateContext() => new CarPartsDbContext();
+        private PharmacyDbContext CreateContext() => new PharmacyDbContext();
 
         /// <summary>
         /// توليد رقم فاتورة شراء تسلسلي فريد وغير مكرر

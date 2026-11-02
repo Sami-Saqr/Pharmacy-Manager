@@ -1,11 +1,11 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Threading;
-using CarPartManager.Models;
-using CarPartManager.MVVM;
-using CarPartManager.Views;
+using PharmacyManager.Models;
+using PharmacyManager.MVVM;
+using PharmacyManager.Views;
 
-namespace CarPartManager.ViewModels
+namespace PharmacyManager.ViewModels
 {
     /// <summary>
     /// نموذج العرض الرئيسي للتطبيق وتوجيه التنقل بين الشاشات
@@ -34,7 +34,7 @@ namespace CarPartManager.ViewModels
             private set => SetProperty(ref _currentScreenTitle, value);
         }
 
-        private string _storeName = "مركز الصقر لقطع غيار السيارات";
+        private string _storeName = "PharmacyManager"; // TODO Phase 1A: استبدال بـ Settings.PharmacyName
         public string StoreName
         {
             get => _storeName;
@@ -114,7 +114,7 @@ namespace CarPartManager.ViewModels
             NavigationItems = new ObservableCollection<NavItem>
             {
                 new NavItem("Dashboard", "نظرة عامة على المتجر", "M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"),
-                new NavItem("Products", "الأصناف وقطع الغيار", "M20 7l-8-4-8 4 8 4 8-4zm-8 6l-8-4v8l8 4 8-4v-8l-8 4z"),
+                new NavItem("Products", "الأصناف والمنتجات", "M20 7l-8-4-8 4 8 4 8-4zm-8 6l-8-4v8l8 4 8-4v-8l-8 4z"),
                 new NavItem("Inventory", "المخزون والجرد", "M4 6h16v2H4V6zm2 4h12v2H6v-2zm-2 4h16v2H4v-2zm2 4h12v2H6v-2z"),
                 new NavItem("POS", "نقطة البيع (الكاشير)", "M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"),
                 new NavItem("SalesInvoicesHistory", "سجل فواتير المبيعات", "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"),
@@ -273,7 +273,7 @@ namespace CarPartManager.ViewModels
                 {
                     "POS" => "شاشة نقطة البيع السريعة (الكاشير): إصدار فواتير بيع فورية مع مسح الباركود، دعم طرق الدفع المتعددة والطباعة المباشرة.",
                     "SalesInvoices" => "سجل فواتير المبيعات: أرشيف الفواتير الصادرة، إدارة المرتجعات، وتفاصيل الضرائب وبيانات الزبائن.",
-                    "PurchaseInvoices" => "سجل فواتير المشتريات: تتبع فواتير الوكلاء وموردي قطع الغيار، ومطابقة الكميات المستلمة في المستودع.",
+                    "PurchaseInvoices" => "سجل فواتير المشتريات: تتبع فواتير الموردين ومطابقة الكميات المستلمة في المخزون.",
                     "Customers" => "سجل العملاء والورش: إدارة بيانات العملاء الأفراد والورش الفنية ومراكز الصيانة وحسابات الديون والآجل.",
                     "Suppliers" => "سجل الموردين والشركات: دمج بيانات وكلاء القطع وشركات الاستيراد وأرصدة المستحقات والدفعات.",
                     _ => "سيتم تطوير وبرمجة هذه الشاشة وربطها بقاعدة البيانات في المراحل القادمة."

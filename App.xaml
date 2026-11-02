@@ -1,9 +1,9 @@
-<Application x:Class="CarPartManager.App"
+﻿<Application x:Class="PharmacyManager.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:CarPartManager"
-             xmlns:viewmodels="clr-namespace:CarPartManager.ViewModels"
-             xmlns:views="clr-namespace:CarPartManager.Views"
+             xmlns:local="clr-namespace:PharmacyManager"
+             xmlns:viewmodels="clr-namespace:PharmacyManager.ViewModels"
+             xmlns:views="clr-namespace:PharmacyManager.Views"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>

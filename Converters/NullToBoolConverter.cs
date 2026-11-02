@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace CarPartManager.Converters
+namespace PharmacyManager.Converters
 {
     /// <summary>
     /// Converts null to true, non-null to false (for IsEnabled when checking if object is null)

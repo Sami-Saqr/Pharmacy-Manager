@@ -1,9 +1,9 @@
-<UserControl x:Class="CarPartManager.Views.SuppliersView"
+﻿<UserControl x:Class="PharmacyManager.Views.SuppliersView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:viewmodels="clr-namespace:CarPartManager.ViewModels"
+             xmlns:viewmodels="clr-namespace:PharmacyManager.ViewModels"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance Type=viewmodels:SuppliersViewModel}"
              d:DesignHeight="750" d:DesignWidth="1100"
@@ -25,7 +25,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0">
-                <TextBlock Text="دليل الموردين وشركات قطع الغيار" 
+                <TextBlock Text="دليل الموردين والشركات" 
                            FontSize="22" 
                            FontWeight="Bold" 
                            Foreground="{StaticResource TextPrimaryBrush}" />

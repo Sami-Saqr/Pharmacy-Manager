@@ -1,6 +1,6 @@
-using System.Windows;
+﻿using System.Windows;
 
-namespace CarPartManager.Views
+namespace PharmacyManager.Views
 {
     public partial class UnsavedChangesDialog : Window
     {

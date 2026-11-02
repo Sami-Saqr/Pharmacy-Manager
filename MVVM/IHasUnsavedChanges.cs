@@ -1,4 +1,4 @@
-namespace CarPartManager.MVVM
+﻿namespace PharmacyManager.MVVM
 {
     public interface IHasUnsavedChanges
     {
