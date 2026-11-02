@@ -1,6 +1,6 @@
-using CarPartManager.Models;
+﻿using PharmacyManager.Models;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     /// <summary>
     /// واجهة خدمة فواتير المبيعات ونقاط البيع وخصم المخزون

@@ -1,6 +1,6 @@
-using CarPartManager.Models;
+﻿using PharmacyManager.Models;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     /// <summary>
     /// خدمة التقارير المحاسبية — قراءة فقط. لا تُعدّل أي بيانات إطلاقاً.

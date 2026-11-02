@@ -1,7 +1,7 @@
 using System.IO;
 using ClosedXML.Excel;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     public sealed class ExcelExportService : IExcelExportService
     {
@@ -37,7 +37,7 @@ namespace CarPartManager.Services
                 using (var output = new XLWorkbook())
                 {
                     output.Properties.Title = workbook.Title;
-                    output.Properties.Author = "CarPartManager";
+                    output.Properties.Author = "PharmacyManager";
                     var usedSheetNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                     foreach (var sheet in workbook.Sheets)
                     {

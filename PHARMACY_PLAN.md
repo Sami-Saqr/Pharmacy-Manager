@@ -67,15 +67,15 @@
 
 ### المرحلة 0 — التجهيز وإعادة التسمية (`phase-0-rename`)
 **0a — تلخيص الـ handover**
-- [ ] نقل الأقسام القديمة من `HANDOVER.md` إلى `HANDOVER_ARCHIVE.md`.
-- [ ] `HANDOVER.md` الجديد (أقل من 120 سطر): المعمارية، القواعد الثابتة، آخر حالة، Open issues، رابط لهذا الملف.
+- [x] نقل الأقسام القديمة من `HANDOVER.md` إلى `HANDOVER_ARCHIVE.md`.
+- [x] `HANDOVER.md` الجديد (أقل من 120 سطر): المعمارية، القواعد الثابتة، آخر حالة، Open issues، رابط لهذا الملف.
 
 **0b — إعادة التسمية (commit ميكانيكي، من غير أي تغيير منطق)**
-- [ ] `CarPartManager` → `PharmacyManager`: solution، `.csproj`، namespaces، فولدر الـ Tests، assembly name.
-- [ ] `CarPartsDbContext` (أو ما يقابله) → `PharmacyDbContext`.
-- [ ] مسار الداتابيز: `%LOCALAPPDATA%\PharmacyManager\pharmacy.db` (الملف القديم لا يتحذف).
-- [ ] نصوص الواجهة: "قطع الغيار"، عناوين النوافذ، اسم التطبيق.
-- [ ] أسماء الجداول والأعمدة **تفضل زي ما هي**.
+- [x] `CarPartManager` → `PharmacyManager`: solution، `.csproj`، namespaces، فولدر الـ Tests، assembly name.
+- [x] `CarPartsDbContext` (أو ما يقابله) → `PharmacyDbContext`.
+- [x] مسار الداتابيز: `%LOCALAPPDATA%\PharmacyManager\pharmacy.db` (الملف القديم لا يتحذف).
+- [x] نصوص الواجهة: "قطع الغيار"، عناوين النوافذ، اسم التطبيق.
+- [x] أسماء الجداول والأعمدة **تفضل زي ما هي**.
 
 **Done when:** build ناجح، الـ 23 test ناجحين، التطبيق بيفتح ببيانات فاضية.
 
@@ -256,4 +256,4 @@
 
 ## 10. تتبع التقدم
 
-- [ ] 0  - [ ] 1A  - [ ] 1B-1  - [ ] 1B-2  - [ ] 1B-3  - [ ] 2  - [ ] 3  - [ ] 4
+- [x] 0  - [ ] 1A  - [ ] 1B-1  - [ ] 1B-2  - [ ] 1B-3  - [ ] 2  - [ ] 3  - [ ] 4

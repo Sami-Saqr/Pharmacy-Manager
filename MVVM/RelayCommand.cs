@@ -1,6 +1,6 @@
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
-namespace CarPartManager.MVVM
+namespace PharmacyManager.MVVM
 {
     /// <summary>
     /// كلاس لتمرير الأوامر (Commands) من واجهة XAML إلى منطق الـ ViewModel

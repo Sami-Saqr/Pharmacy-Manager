@@ -1,4 +1,4 @@
-namespace CarPartManager.Models
+﻿namespace PharmacyManager.Models
 {
     /// <summary>
     /// سطر في كشف حساب العميل — يمثل إما فاتورة بيع أو دفعة، مع رصيد تراكمي.

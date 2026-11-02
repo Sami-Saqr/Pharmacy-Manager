@@ -1,7 +1,7 @@
-using CarPartManager.Models;
-using CarPartManager.MVVM;
+﻿using PharmacyManager.Models;
+using PharmacyManager.MVVM;
 
-namespace CarPartManager.ViewModels
+namespace PharmacyManager.ViewModels
 {
     /// <summary>
     /// نموذج عرض نافذة إضافة أو تعديل قطعة الغيار (Product Dialog ViewModel).
@@ -103,7 +103,7 @@ namespace CarPartManager.ViewModels
 
         public bool HasError => !string.IsNullOrWhiteSpace(_errorMessage);
 
-        // قائمة التصنيفات المقترحة لقطع السيارات
+        // قائمة التصنيفات المقترحة
         public List<string> AvailableCategories { get; } = new()
         {
             "مكابح وفرامل",

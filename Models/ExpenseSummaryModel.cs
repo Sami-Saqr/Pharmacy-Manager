@@ -1,4 +1,4 @@
-namespace CarPartManager.Models
+﻿namespace PharmacyManager.Models
 {
     /// <summary>
     /// ملخص مصروفات الشاشة (Expense Summary Model) — يُحسب دائماً من المصروفات النشطة فقط،

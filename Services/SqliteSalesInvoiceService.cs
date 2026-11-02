@@ -1,16 +1,16 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
-using CarPartManager.Data;
-using CarPartManager.Models;
+using PharmacyManager.Data;
+using PharmacyManager.Models;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     /// <summary>
     /// خدمة إدارة فواتير المبيعات ونقاط البيع المعتمدة على SQLite وتحديث المخزون عبر المعاملات الذرية
     /// </summary>
     public class SqliteSalesInvoiceService : ISalesInvoiceService
     {
-        protected virtual CarPartsDbContext CreateContext() => new CarPartsDbContext();
+        protected virtual PharmacyDbContext CreateContext() => new PharmacyDbContext();
 
         /// <summary>
         /// توليد رقم فاتورة بيع تسلسلي فريد وغير مكرر (مثل INV-2026-0001)
@@ -621,7 +621,7 @@ namespace CarPartManager.Services
         /// 3. إدخال اسم فقط -> مطابقة بالاسم الموحد (trim, collapse spaces, case-insensitive)، إعادة استخدامه إن وجد أو إنشاؤه.
         /// 4. ترك الحقول فارغة / عميل نقدي -> بيع مباشر (Walk-in sale) مع CustomerId = null.
         /// </summary>
-        private static async Task ResolveAndLinkCustomerAsync(CarPartsDbContext context, SalesInvoiceModel inputInvoice, SalesInvoiceModel targetInvoice)
+        private static async Task ResolveAndLinkCustomerAsync(PharmacyDbContext context, SalesInvoiceModel inputInvoice, SalesInvoiceModel targetInvoice)
         {
             // 1. اختيار صريح لعميل مسجل مسبقاً من المقترحات
             if (inputInvoice.CustomerId.HasValue && inputInvoice.CustomerId.Value > 0)

@@ -1,8 +1,8 @@
-using System.IO;
-using CarPartManager.MVVM;
-using CarPartManager.Services;
+﻿using System.IO;
+using PharmacyManager.MVVM;
+using PharmacyManager.Services;
 
-namespace CarPartManager.ViewModels
+namespace PharmacyManager.ViewModels
 {
     public abstract class ExcelExportViewModelBase : ViewModelBase
     {

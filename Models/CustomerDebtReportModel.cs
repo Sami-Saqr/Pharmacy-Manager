@@ -1,4 +1,4 @@
-namespace CarPartManager.Models
+﻿namespace PharmacyManager.Models
 {
     /// <summary>صف عميل في تقرير المديونيات (الحالة الحالية)</summary>
     public class CustomerDebtRow

@@ -1,9 +1,9 @@
-<UserControl x:Class="CarPartManager.Views.PurchaseInvoicesView"
+﻿<UserControl x:Class="PharmacyManager.Views.PurchaseInvoicesView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:viewmodels="clr-namespace:CarPartManager.ViewModels"
+             xmlns:viewmodels="clr-namespace:PharmacyManager.ViewModels"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance Type=viewmodels:PurchaseInvoicesViewModel}"
              d:DesignHeight="850" d:DesignWidth="1200"
@@ -27,7 +27,7 @@
                                FontSize="22" 
                                FontWeight="Bold" 
                                Foreground="{StaticResource TextPrimaryBrush}" />
-                    <TextBlock Text="إدخال فواتير الموردين واعتمادها لتحديث رصيد قطع الغيار — لعرض سجل الفواتير السابقة انتقل لقسم (سجل فواتير المشتريات) من القائمة" 
+                    <TextBlock Text="إدخال فواتير الموردين واعتمادها لتحديث رصيد المخزون — لعرض سجل الفواتير السابقة انتقل لقسم (سجل فواتير المشتريات) من القائمة" 
                                FontSize="13" 
                                Foreground="{StaticResource TextSecondaryBrush}" 
                                Margin="0,4,0,0" />
@@ -115,7 +115,7 @@
                     <!-- كرت إضافة صنف إلى الفاتورة -->
                     <Border Grid.Row="1" Style="{StaticResource ContentPanelCardStyle}" Margin="0,0,0,16" IsEnabled="{Binding CanEditInvoice}">
                         <StackPanel>
-                            <TextBlock Text="إضافة صنف من قطع الغيار المسجلة" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,12" />
+                            <TextBlock Text="إضافة صنف من الأصناف المسجلة" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,12" />
 
                             <Grid>
                                 <Grid.ColumnDefinitions>

@@ -1,7 +1,7 @@
-using ClosedXML.Excel;
-using CarPartManager.Models;
+﻿using ClosedXML.Excel;
+using PharmacyManager.Models;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     public static class PartBExcelExportMappers
     {

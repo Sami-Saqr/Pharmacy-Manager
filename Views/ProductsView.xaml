@@ -1,9 +1,9 @@
-<UserControl x:Class="CarPartManager.Views.ProductsView"
+﻿<UserControl x:Class="PharmacyManager.Views.ProductsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:viewmodels="clr-namespace:CarPartManager.ViewModels"
+             xmlns:viewmodels="clr-namespace:PharmacyManager.ViewModels"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance Type=viewmodels:ProductsViewModel}"
              d:DesignHeight="750" d:DesignWidth="1100"
@@ -17,7 +17,7 @@
             <RowDefinition Height="Auto" />
             <!-- 3. شريط البحث والتصفية -->
             <RowDefinition Height="Auto" />
-            <!-- 4. جدول قطع الغيار الرئيسي -->
+            <!-- 4. جدول الأصناف الرئيسي -->
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -29,11 +29,11 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0">
-                <TextBlock Text="دليل الأصناف وقطع الغيار" 
+                <TextBlock Text="دليل الأصناف والمنتجات" 
                            FontSize="22" 
                            FontWeight="Bold" 
                            Foreground="{StaticResource TextPrimaryBrush}" />
-                <TextBlock Text="إدارة قاعدة بيانات قطع السيارات، تسجيل أرقام OEM، الأسعار، ومراقبة أرصدة المستودع" 
+                <TextBlock Text="إدارة قاعدة بيانات الأصناف والمنتجات، الأسعار، ومراقبة أرصدة المخزون" 
                            FontSize="13" 
                            Foreground="{StaticResource TextSecondaryBrush}" 
                            Margin="0,4,0,0" />
@@ -195,7 +195,7 @@
             </Grid>
         </Border>
 
-        <!-- 4. جدول قطع الغيار الرئيسي (Products Table) -->
+        <!-- 4. جدول الأصناف الرئيسي (Products Table) -->
         <Border Grid.Row="3" Style="{StaticResource ContentPanelCardStyle}" Padding="0">
             <Grid>
                 <!-- الجدول -->

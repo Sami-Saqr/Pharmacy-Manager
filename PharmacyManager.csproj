@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <AssemblyName>PharmacyManager</AssemblyName>
+    <RootNamespace>PharmacyManager</RootNamespace>
   </PropertyGroup>
 
   <!-- استثناء مجلد النسخ الاحتياطية أو المجلدات الإضافية من التجميع لمنع تكرار الكلاسات -->
@@ -17,9 +19,10 @@
 
   <!-- استثناء مشروع الاختبار المتداخل من تجميع التطبيق (مطلوب لأنه موجود داخل مجلد التطبيق) لمنع تكرار الخصائص -->
   <ItemGroup>
-    <Compile Remove="CarPartManager.Tests\**" />
-    <Page Remove="CarPartManager.Tests\**" />
-    <None Remove="CarPartManager.Tests\**" />
+    <Compile Remove="PharmacyManager.Tests\**" />
+    <EmbeddedResource Remove="PharmacyManager.Tests\**" />
+    <None Remove="PharmacyManager.Tests\**" />
+    <Page Remove="PharmacyManager.Tests\**" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.105.1" />

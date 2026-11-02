@@ -1,9 +1,9 @@
-using CarPartManager.Models;
+﻿using PharmacyManager.Models;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     /// <summary>
-    /// واجهة خدمة إدارة قطع الغيار (IProductService).
+    /// واجهة خدمة إدارة الأصناف (IProductService).
     /// تفصل طبقة البيانات عن واجهات العرض (UI)، مما يتيح استبدال البيانات التجريبية
     /// بقاعدة بيانات حقيقية (SQLite / Entity Framework Core) لاحقاً دون تعديل شاشات العرض.
     /// </summary>

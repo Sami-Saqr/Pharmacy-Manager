@@ -1,12 +1,12 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
-using CarPartManager.Models;
-using CarPartManager.MVVM;
-using CarPartManager.Services;
-using CarPartManager.Views;
+using PharmacyManager.Models;
+using PharmacyManager.MVVM;
+using PharmacyManager.Services;
+using PharmacyManager.Views;
 
-namespace CarPartManager.ViewModels
+namespace PharmacyManager.ViewModels
 {
     /// <summary>
     /// نموذج عرض شاشة المخزون والجرد

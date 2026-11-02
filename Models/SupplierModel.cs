@@ -1,9 +1,9 @@
-using CarPartManager.MVVM;
+﻿using PharmacyManager.MVVM;
 
-namespace CarPartManager.Models
+namespace PharmacyManager.Models
 {
     /// <summary>
-    /// نموذج بيانات المورد أو شركة قطع الغيار (Supplier Model)
+    /// نموذج بيانات المورد (Supplier Model)
     /// </summary>
     public class SupplierModel : ViewModelBase
     {

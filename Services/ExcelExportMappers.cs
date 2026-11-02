@@ -1,4 +1,4 @@
-namespace CarPartManager.Services
+﻿namespace PharmacyManager.Services
 {
     public static class ExcelExportMappers
     {

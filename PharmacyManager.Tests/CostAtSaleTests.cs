@@ -1,11 +1,11 @@
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using CarPartManager.Data;
-using CarPartManager.Models;
-using CarPartManager.Services;
+using PharmacyManager.Data;
+using PharmacyManager.Models;
+using PharmacyManager.Services;
 using Xunit;
 
-namespace CarPartManager.Tests;
+namespace PharmacyManager.Tests;
 
 /// <summary>
 /// اختبارات تثبيت تكلفة الوحدة وقت البيع على بنود فواتير المبيعات واستخدامها في التقارير،
@@ -25,35 +25,35 @@ public sealed class CostAtSaleTests
     private sealed class TestDb : IDisposable
     {
         public SqliteConnection Connection { get; }
-        public DbContextOptions<CarPartsDbContext> Options { get; }
+        public DbContextOptions<PharmacyDbContext> Options { get; }
 
         public TestDb()
         {
             Connection = new SqliteConnection("DataSource=:memory:");
             Connection.Open();
-            Options = new DbContextOptionsBuilder<CarPartsDbContext>()
+            Options = new DbContextOptionsBuilder<PharmacyDbContext>()
                 .UseSqlite(Connection)
                 .Options;
-            using var ctx = new CarPartsDbContext(Options);
+            using var ctx = new PharmacyDbContext(Options);
             ctx.Database.EnsureCreated();
         }
 
-        public CarPartsDbContext NewContext() => new CarPartsDbContext(Options);
+        public PharmacyDbContext NewContext() => new PharmacyDbContext(Options);
         public void Dispose() => Connection.Dispose();
     }
 
     private sealed class TestableSalesInvoiceService : SqliteSalesInvoiceService
     {
-        private readonly DbContextOptions<CarPartsDbContext> _options;
-        public TestableSalesInvoiceService(DbContextOptions<CarPartsDbContext> options) => _options = options;
-        protected override CarPartsDbContext CreateContext() => new CarPartsDbContext(_options);
+        private readonly DbContextOptions<PharmacyDbContext> _options;
+        public TestableSalesInvoiceService(DbContextOptions<PharmacyDbContext> options) => _options = options;
+        protected override PharmacyDbContext CreateContext() => new PharmacyDbContext(_options);
     }
 
     private sealed class TestableReportsService : SqliteReportsService
     {
-        private readonly DbContextOptions<CarPartsDbContext> _options;
-        public TestableReportsService(DbContextOptions<CarPartsDbContext> options) => _options = options;
-        protected override CarPartsDbContext CreateContext() => new CarPartsDbContext(_options);
+        private readonly DbContextOptions<PharmacyDbContext> _options;
+        public TestableReportsService(DbContextOptions<PharmacyDbContext> options) => _options = options;
+        protected override PharmacyDbContext CreateContext() => new PharmacyDbContext(_options);
     }
 
     private static ProductModel SeedProduct(TestDb db, string partNumber, int qty, decimal purchasePrice)
@@ -101,9 +101,9 @@ public sealed class CostAtSaleTests
         };
     }
 
-    private static List<string> GetColumns(DbContextOptions<CarPartsDbContext> options, string table)
+    private static List<string> GetColumns(DbContextOptions<PharmacyDbContext> options, string table)
     {
-        using var ctx = new CarPartsDbContext(options);
+        using var ctx = new PharmacyDbContext(options);
         var conn = ctx.Database.GetDbConnection();
         if (conn.State != System.Data.ConnectionState.Open) conn.Open();
         using var cmd = conn.CreateCommand();

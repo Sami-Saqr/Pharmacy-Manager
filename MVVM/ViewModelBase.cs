@@ -1,7 +1,7 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace CarPartManager.MVVM
+namespace PharmacyManager.MVVM
 {
     /// <summary>
     /// كلاس أساسي لجميع الـ ViewModels يطبق واجهة INotifyPropertyChanged

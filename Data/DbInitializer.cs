@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using CarPartManager.Models;
-using CarPartManager.Services;
+﻿using Microsoft.EntityFrameworkCore;
+using PharmacyManager.Models;
+using PharmacyManager.Services;
 
-namespace CarPartManager.Data
+namespace PharmacyManager.Data
 {
     /// <summary>
     /// مسؤول تهيئة قاعدة البيانات والتأكد من وجود الجداول وتغذيتها ببيانات أولية إن كانت فارغة.
@@ -13,7 +13,7 @@ namespace CarPartManager.Data
         public static List<string> DuplicatePhonesReport { get; } = new();
         public static bool IsUniquePhoneIndexApplied { get; private set; }
 
-        public static async Task InitializeAsync(CarPartsDbContext context)
+        public static async Task InitializeAsync(PharmacyDbContext context)
         {
             // 1. إنشاء قاعدة البيانات إن لم تكن موجودة
             await context.Database.EnsureCreatedAsync();
@@ -34,7 +34,7 @@ namespace CarPartManager.Data
             }
         }
 
-        private static async Task EnsureTablesCreatedAsync(CarPartsDbContext context)
+        private static async Task EnsureTablesCreatedAsync(PharmacyDbContext context)
         {
             // إنشاء جدول الموردين إن لم يكن موجوداً
             await context.Database.ExecuteSqlRawAsync(@"
@@ -297,7 +297,7 @@ namespace CarPartManager.Data
         /// إنشاء جداول وحدة المصروفات بشكل تراكمي وآمن (CREATE TABLE IF NOT EXISTS)
         /// لا تُحذف ولا تُعدَّل أي بيانات أو جداول موجودة مسبقاً.
         /// </summary>
-        private static async Task EnsureExpenseTablesCreatedAsync(CarPartsDbContext context)
+        private static async Task EnsureExpenseTablesCreatedAsync(PharmacyDbContext context)
         {
             // إنشاء جدول تصنيفات المصروفات إن لم يكن موجوداً
             await context.Database.ExecuteSqlRawAsync(@"
@@ -378,7 +378,7 @@ namespace CarPartManager.Data
         /// تغذية التصنيفات الافتراضية للمصروفات (Idempotent Seed)
         /// لا يُضاف تصنيف موجود مسبقاً بنفس الاسم بعد توحيده (تقليم المسافات وتقليصها وتجاهل حالة الأحرف).
         /// </summary>
-        private static async Task SeedDefaultExpenseCategoriesAsync(CarPartsDbContext context)
+        private static async Task SeedDefaultExpenseCategoriesAsync(PharmacyDbContext context)
         {
             try
             {
@@ -412,7 +412,7 @@ namespace CarPartManager.Data
             }
         }
 
-        private static async Task MigrateCustomerPhoneIndexAsync(CarPartsDbContext context)
+        private static async Task MigrateCustomerPhoneIndexAsync(PharmacyDbContext context)
         {
             try
             {
@@ -475,7 +475,7 @@ namespace CarPartManager.Data
         /// الفحص يتم عبر PRAGMA table_info أولاً، ثم ALTER TABLE ADD COLUMN فقط عند غيابه (بدون أي حذف أو إعادة إنشاء).
         /// البنود القديمة تبقى NULL عمداً ولا تُملأ بأي تكلفة تقديرية.
         /// </summary>
-        private static async Task EnsureUnitCostAtSaleColumnAsync(CarPartsDbContext context)
+        private static async Task EnsureUnitCostAtSaleColumnAsync(PharmacyDbContext context)
         {
             const string tableName = "SalesInvoiceItems";
             const string columnName = "UnitCostAtSale";
@@ -489,7 +489,7 @@ namespace CarPartManager.Data
         /// <summary>
         /// فحص وجود عمود في جدول SQLite باستخدام PRAGMA table_info (قراءة فقط).
         /// </summary>
-        private static async Task<bool> ColumnExistsAsync(CarPartsDbContext context, string tableName, string columnName)
+        private static async Task<bool> ColumnExistsAsync(PharmacyDbContext context, string tableName, string columnName)
         {
             var connection = context.Database.GetDbConnection();
             var shouldClose = connection.State != System.Data.ConnectionState.Open;
@@ -518,7 +518,7 @@ namespace CarPartManager.Data
             }
         }
 
-        private static async Task SeedInitialProductsAsync(CarPartsDbContext context)
+        private static async Task SeedInitialProductsAsync(PharmacyDbContext context)
         {
             var initialProducts = new List<ProductModel>
             {
@@ -632,7 +632,7 @@ namespace CarPartManager.Data
             await context.SaveChangesAsync();
         }
 
-        private static async Task SeedInitialSuppliersAsync(CarPartsDbContext context)
+        private static async Task SeedInitialSuppliersAsync(PharmacyDbContext context)
         {
             var initialSuppliers = new List<SupplierModel>
             {
@@ -674,7 +674,7 @@ namespace CarPartManager.Data
         /// ينشئ حركة "رصيد افتتاحي" لكل صنف ليس له حركة افتتاحية مسجلة مسبقاً
         /// هذه العملية ثابتة (idempotent) - يمكن تشغيلها عدة مرات دون تكرار
         /// </summary>
-        private static async Task BackfillOpeningStockMovementsAsync(CarPartsDbContext context)
+        private static async Task BackfillOpeningStockMovementsAsync(PharmacyDbContext context)
         {
             try
             {
@@ -719,7 +719,7 @@ namespace CarPartManager.Data
             await EnsureStocktakeTablesCreatedAsync(context);
         }
 
-        private static async Task EnsureStocktakeTablesCreatedAsync(CarPartsDbContext context)
+        private static async Task EnsureStocktakeTablesCreatedAsync(PharmacyDbContext context)
         {
             // إنشاء جدول جلسات الجرد إن لم يكن موجوداً
             await context.Database.ExecuteSqlRawAsync(@"

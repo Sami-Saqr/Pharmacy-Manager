@@ -1,8 +1,8 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using CarPartManager.ViewModels;
+using PharmacyManager.ViewModels;
 
-namespace CarPartManager.Views
+namespace PharmacyManager.Views
 {
     /// <summary>
     /// Interaction logic for CustomersView.xaml

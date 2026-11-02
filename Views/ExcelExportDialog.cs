@@ -1,10 +1,10 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using CarPartManager.ViewModels;
+using PharmacyManager.ViewModels;
 using Microsoft.Win32;
 
-namespace CarPartManager.Views
+namespace PharmacyManager.Views
 {
     internal static class ExcelExportDialog
     {

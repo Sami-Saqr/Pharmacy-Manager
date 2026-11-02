@@ -1,9 +1,9 @@
-using System.Collections.ObjectModel;
-using CarPartManager.Models;
-using CarPartManager.MVVM;
-using CarPartManager.Services;
+﻿using System.Collections.ObjectModel;
+using PharmacyManager.Models;
+using PharmacyManager.MVVM;
+using PharmacyManager.Services;
 
-namespace CarPartManager.ViewModels
+namespace PharmacyManager.ViewModels
 {
     /// <summary>
     /// نموذج عرض شاشة التقارير المحاسبية (الجزء أ): مرشّح تاريخي عام + ملخص الأرباح + تقرير المبيعات + تقرير المصروفات.

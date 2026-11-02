@@ -1,4 +1,4 @@
-namespace CarPartManager.Models
+﻿namespace PharmacyManager.Models
 {
     /// <summary>
     /// ملخص الأرباح لفترة محددة، مع إمكانية إرفاق الفترة السابقة المماثلة للمقارنة.

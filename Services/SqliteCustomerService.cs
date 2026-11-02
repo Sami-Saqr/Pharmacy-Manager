@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using CarPartManager.Data;
-using CarPartManager.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using PharmacyManager.Data;
+using PharmacyManager.Models;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     /// <summary>
     /// خدمة إدارة العملاء المعتمدة على SQLite (SqliteCustomerService)
@@ -11,7 +11,7 @@ namespace CarPartManager.Services
     /// </summary>
     public class SqliteCustomerService : ICustomerService
     {
-        private CarPartsDbContext CreateContext() => new CarPartsDbContext();
+        private PharmacyDbContext CreateContext() => new PharmacyDbContext();
 
         // ══════════════════════════════════════════════════════════════════════
         // استرجاع العملاء
@@ -202,7 +202,7 @@ namespace CarPartManager.Services
         /// الصيغة: OpeningBalance + Σ(GrandTotal - PaidAmount) للفواتير المرتبطة المعتمدة - Σ دفعات العميل
         /// </summary>
         private static async Task<decimal> CalculateBalanceInternalAsync(
-            CarPartsDbContext ctx, int customerId, decimal openingBalance)
+            PharmacyDbContext ctx, int customerId, decimal openingBalance)
         {
             // مجموع المبالغ غير المدفوعة من فواتير المبيعات المرتبطة بهذا العميل
             var invoicesDebt = await ctx.SalesInvoices

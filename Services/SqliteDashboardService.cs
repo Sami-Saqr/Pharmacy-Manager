@@ -1,15 +1,15 @@
-using Microsoft.EntityFrameworkCore;
-using CarPartManager.Data;
-using CarPartManager.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using PharmacyManager.Data;
+using PharmacyManager.Models;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     /// <summary>
     /// خدمة استخراج مؤشرات وإحصائيات لوحة التحكم من قاعدة بيانات SQLite المحلية
     /// </summary>
     public class SqliteDashboardService : IDashboardService
     {
-        private CarPartsDbContext CreateContext() => new CarPartsDbContext();
+        private PharmacyDbContext CreateContext() => new PharmacyDbContext();
 
         public async Task<DashboardSummaryDto> GetDashboardSummaryAsync()
         {

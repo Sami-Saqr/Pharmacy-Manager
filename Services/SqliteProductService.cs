@@ -1,11 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using CarPartManager.Data;
-using CarPartManager.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using PharmacyManager.Data;
+using PharmacyManager.Models;
 
-namespace CarPartManager.Services
+namespace PharmacyManager.Services
 {
     /// <summary>
-    /// خدمة إدارة قطع الغيار المعتمدة على قاعدة بيانات SQLite المحلية الحقيقية.
+    /// خدمة إدارة الأصناف المعتمدة على قاعدة بيانات SQLite المحلية الحقيقية.
     /// تطبق واجهة IProductService وتفصل بالكامل استعلامات قاعدة البيانات عن شاشات العرض.
     /// </summary>
     public class SqliteProductService : IProductService
@@ -14,7 +14,7 @@ namespace CarPartManager.Services
         {
         }
 
-        private CarPartsDbContext CreateContext() => new CarPartsDbContext();
+        private PharmacyDbContext CreateContext() => new PharmacyDbContext();
 
         public async Task<IEnumerable<ProductModel>> GetAllProductsAsync()
         {

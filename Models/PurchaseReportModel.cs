@@ -1,4 +1,4 @@
-namespace CarPartManager.Models
+﻿namespace PharmacyManager.Models
 {
     /// <summary>صف يومي في تقرير المشتريات (قراءة فقط)</summary>
     public class PurchaseDailyReportRow

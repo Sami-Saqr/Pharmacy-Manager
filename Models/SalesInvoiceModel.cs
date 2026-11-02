@@ -1,7 +1,7 @@
-using System.Collections.ObjectModel;
-using CarPartManager.MVVM;
+﻿using System.Collections.ObjectModel;
+using PharmacyManager.MVVM;
 
-namespace CarPartManager.Models
+namespace PharmacyManager.Models
 {
     /// <summary>
     /// يمثل فاتورة مبيعات صادرة للعميل (Sales Invoice Model)

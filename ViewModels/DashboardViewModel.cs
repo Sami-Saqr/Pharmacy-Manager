@@ -1,11 +1,11 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
-using CarPartManager.Models;
-using CarPartManager.MVVM;
-using CarPartManager.Services;
+using PharmacyManager.Models;
+using PharmacyManager.MVVM;
+using PharmacyManager.Services;
 
-namespace CarPartManager.ViewModels
+namespace PharmacyManager.ViewModels
 {
     /// <summary>
     /// نموذج عرض لوحة التحكم الرئيسية (Dashboard ViewModel).
@@ -73,7 +73,7 @@ namespace CarPartManager.ViewModels
             set => SetProperty(ref _invoiceCountSubtext, value);
         }
 
-        // بطاقة 3: إجمالي قطع الغيار والأصناف
+        // بطاقة 3: إجمالي الأصناف
         private string _productCount = "0 صنف";
         public string ProductCount
         {
@@ -224,7 +224,7 @@ namespace CarPartManager.ViewModels
                 InvoiceCount = $"{totalTodayInvoices} فواتير اليوم";
                 InvoiceCountSubtext = $"{summary.TodaySalesCount} بيع • {summary.TodayPurchasesCount} شراء (مرتجعات: {summary.TotalReturnsCount})";
 
-                // 4. تحديث بطاقة الأصناف وقطع الغيار
+                // 4. تحديث بطاقة الأصناف والمنتجات
                 ProductCount = $"{summary.TotalProductsCount:N0} صنف";
                 ProductCountSubtext = $"موزعة على {summary.TotalCategoriesCount} تصنيفات • {summary.TotalPiecesCount:N0} قطعة بالمستودع";
 

@@ -1,6 +1,6 @@
-using System.Windows;
+﻿using System.Windows;
 
-namespace CarPartManager.Views
+namespace PharmacyManager.Views
 {
     /// <summary>
     /// نافذة منبثقة لإنشاء جلسة جرد جديدة (تجمّع اسم الجلسة والملاحظات فقط).
